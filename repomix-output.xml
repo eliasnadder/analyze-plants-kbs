@@ -47,9 +47,11 @@ core.py
 eggplant_rules.py
 garlic_rules.py
 grape_rules.py
+LICENSE
 main.py
 onion_rules.py
 Potato_rules.py
+test_project.py
 tomato_rules.py
 zucchini_rules.py
 </directory_structure>
@@ -95,7 +97,7 @@ class AppleRules(PlantDiagnosisEngine):
         salience=20
     )
     def diagnose_apple_scab_partial(self, cf1=0, cf2=0, cf3=0):
-        final_cf = round(min(v for v in [cf1, cf2, cf3] if v > 0) * 0.65)
+        final_cf = round(min(cf1, cf2, cf3) * 0.65)
         print(f"\n⚠️ تشخيص مبدئي: جرب التفاح (درجة الثقة: {final_cf}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="جرب التفاح"))
@@ -270,7 +272,6 @@ class CherryRules(PlantDiagnosisEngine):
         final = round(min(cf1, cf2, cf3) * 0.85)
         print(f"\n✅ التشخيص: البياض الدقيقي (الكرز) (درجة الثقة: {final}/100)")
         self.declare(Fact(disease="البياض الدقيقي"))
-        self.halt()
 
     @Rule(
         OR(
@@ -292,7 +293,6 @@ class CherryRules(PlantDiagnosisEngine):
         print(f"\n⚠️ تشخيص مبدئي: البياض الدقيقي (الكرز) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="البياض الدقيقي"))
-        self.halt()
 
     @Rule(
         OR(
@@ -308,7 +308,6 @@ class CherryRules(PlantDiagnosisEngine):
         print(f"\n❗ احتمال ضعيف: البياض الدقيقي (الكرز) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="البياض الدقيقي"))
-        self.halt()
 
     @Rule(Fact(disease="البياض الدقيقي"), salience=5)
     def treatment(self):
@@ -525,6 +524,8 @@ class CitrusRules(PlantDiagnosisEngine):
         Symptom(name='إفرازات صمغية وردية أو رمادية في الجذوع', cf=MATCH.cf3),
         Symptom(name='بقع داكنة أو تكاثف للنسيج الخشبي تحت اللحاء', cf=MATCH.cf4),
         TEST(lambda cf1, cf2, cf3, cf4: min(cf1, cf2, cf3, cf4) >= 60)
+    ,
+        salience=30
     )
     def mal_secco_full_4(self, cf1, cf2, cf3, cf4):
         final = round(min(cf1, cf2, cf3, cf4) * 0.9)
@@ -547,6 +548,8 @@ class CitrusRules(PlantDiagnosisEngine):
                 Symptom(name='بقع داكنة أو تكاثف للنسيج الخشبي تحت اللحاء', cf=MATCH.cf3))
         ),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=20
     )
     def mal_secco_partial_strong(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.8)
@@ -564,6 +567,8 @@ class CitrusRules(PlantDiagnosisEngine):
                 Symptom(name='بقع داكنة أو تكاثف للنسيج الخشبي تحت اللحاء', cf=MATCH.cf2)),
         ),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
     )
     def mal_secco_partial_basic(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.6)
@@ -579,6 +584,8 @@ class CitrusRules(PlantDiagnosisEngine):
             Symptom(name='بقع داكنة أو تكاثف للنسيج الخشبي تحت اللحاء', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def mal_secco_weak(self, cf1):
         final = round(cf1 * 0.5)
@@ -586,7 +593,7 @@ class CitrusRules(PlantDiagnosisEngine):
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="مالسيكو"))
 
-    @Rule(Fact(disease="مالسيكو"))
+    @Rule(Fact(disease="مالسيكو"), salience=5)
     def mal_secco_treatment(self):
         print("\n📌 المسبب: مرض مالسيكو في الحمضيات يُسببه الفطر Plenodomus tracheiphilus.")
         print("\n💡 العلاج (مرض مالسيكو - الحمضيات):")
@@ -605,6 +612,8 @@ class CitrusRules(PlantDiagnosisEngine):
         Symptom(name='تقرحات أو تصدعات في اللحاء بالقرب من سطح التربة', cf=MATCH.cf2),
         Symptom(name='ذبول الأصناف وضعف نمو الأوراق', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def gummosis_full_3(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -623,6 +632,8 @@ class CitrusRules(PlantDiagnosisEngine):
                 Symptom(name='ذبول الأصناف وضعف نمو الأورقات', cf=MATCH.cf2))
         ),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
     )
     def gummosis_partial_strong(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.65)
@@ -638,6 +649,8 @@ class CitrusRules(PlantDiagnosisEngine):
             Symptom(name='ذبول الأصناف وضعف نمو الأورقات', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def gummosis_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -645,7 +658,7 @@ class CitrusRules(PlantDiagnosisEngine):
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="عفن الجذور والصمغ"))
 
-    @Rule(Fact(disease="عفن الجذور والصمغ"))
+    @Rule(Fact(disease="عفن الجذور والصمغ"), salience=5)
     def gummosis_treatment(self):
         print("\n📌 المسبب: مرض عفن الجذور في الحمضيات يُسببه الفطر Phytophthora spp.")
         print("\n💡 العلاج (مرض عفن الجذور / الصمغ - الحمضيات):")
@@ -663,6 +676,8 @@ class CitrusRules(PlantDiagnosisEngine):
         Symptom(name='تجعد أو تساقط الأوراق', cf=MATCH.cf2),
         Symptom(name='ضعف في النمو، وقلة الإنتاجية', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def tristeza_full_3(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -680,6 +695,8 @@ class CitrusRules(PlantDiagnosisEngine):
                 Symptom(name='ضعف في النمو، وقلة الإنتاجية', cf=MATCH.cf2))
         ),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
     )
     def tristeza_partial_strong(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.65)
@@ -704,7 +721,7 @@ class CitrusRules(PlantDiagnosisEngine):
         self.declare(Fact(disease="ترايستيزا"))
         self.halt()
 
-    @Rule(Fact(disease="ترايستيزا"))
+    @Rule(Fact(disease="ترايستيزا"), salience=5)
     def tristeza_treatment(self):
         print("\n📌 المسبب: فيروس ترايستيزا (Citrus Tristeza Virus) - CTV")
         print("\n💡 العلاج (مرض ترايستيزا الفيروسي - الحمضيات):")
@@ -722,6 +739,8 @@ class CitrusRules(PlantDiagnosisEngine):
         Symptom(name='تساقط مبكر للثمار', cf=MATCH.cf2),
         Symptom(name='بقع صغيرة على الأوراق في بعض الحالات', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def black_spot_full_3(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -739,6 +758,8 @@ class CitrusRules(PlantDiagnosisEngine):
                 Symptom(name='بقع صغيرة على الأوراق في بعض الحالات', cf=MATCH.cf2))
         ),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
     )
     def black_spot_partial_strong(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.65)
@@ -754,6 +775,8 @@ class CitrusRules(PlantDiagnosisEngine):
             Symptom(name='بقع صغيرة على الأوراق في بعض الحالات', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def black_spot_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -763,7 +786,7 @@ class CitrusRules(PlantDiagnosisEngine):
 
 
 
-    @Rule(Fact(disease="التبقّع الأسود"))
+    @Rule(Fact(disease="التبقّع الأسود"), salience=5)
     def black_spot_treatment(self):
         print("\n📌 المسبب: مرض التبقّع الأسود في الحمضيات يُسببه البكتيريا Xanthomonas citri subsp. citri.")
         print("\n💡 العلاج (مرض التبقّع الأسود - الحمضيات):")
@@ -780,6 +803,8 @@ class CitrusRules(PlantDiagnosisEngine):
         Symptom(name='تقرحات مائية على الأوراق والسيقان والثمار', cf=MATCH.cf1),
         Symptom(name='يحيط بها هالة صفراء', cf=MATCH.cf2),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=30
     )
     def bacterial_canker_full(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.7)
@@ -794,6 +819,8 @@ class CitrusRules(PlantDiagnosisEngine):
             Symptom(name='يحيط بها هالة صفراء', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def bacterial_canker_weak(self, cf1):
         final = round(cf1 * 0.4)
@@ -802,7 +829,7 @@ class CitrusRules(PlantDiagnosisEngine):
         self.declare(Fact(disease="الحصف البكتيري"))
 
 
-    @Rule(Fact(disease="الحصف البكتيري"))
+    @Rule(Fact(disease="الحصف البكتيري"), salience=5)
     def bacterial_canker_treatment(self):
         print("\n📌 المسبب: مرض الحصف البكتيري في الحمضيات يُسببه البكتيريا Xanthomonas citri subsp. citri.")
         print("\n💡 العلاج (مرض الحصف البكتيري - الحمضيات):")
@@ -821,6 +848,8 @@ class CitrusRules(PlantDiagnosisEngine):
         Symptom(name='بقع صفراء-بنية لامعة على السطح السفلي للأوراق', cf=MATCH.cf1),
         Symptom(name='تجعد أو تساقط الأوراق', cf=MATCH.cf2),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=30
     )
     def greasy_spot_full(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.7)
@@ -833,7 +862,7 @@ class CitrusRules(PlantDiagnosisEngine):
             Symptom(name='تجعد أو تساقط الأوراق', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60),
-        salience= 5 ,
+        salience=10 ,
     )
     def greasy_spot_weak(self, cf1):
         final = round(cf1 * 0.4)
@@ -842,7 +871,7 @@ class CitrusRules(PlantDiagnosisEngine):
         self.declare(Fact(disease="البقعة الدهنية"))
         self.halt(),
 
-    @Rule(Fact(disease="البقعة الدهنية"))
+    @Rule(Fact(disease="البقعة الدهنية"), salience=5)
     def greasy_spot_treatment(self):
         print("\n📌 المسبب: مرض البقعة الدهنية في الحمضيات يُسببه الفطر Alternaria citri أو Alternaria alternata.")
         print("\n💡 العلاج (مرض البقعة الدهنية - الحمضيات):")
@@ -876,6 +905,8 @@ class EggplantRules(PlantDiagnosisEngine):
         Symptom(name='تحول الساق الداخلي إلى اللون البني – يظهر عند قطع الجذع انسياب سائل مخاطي', cf=MATCH.cf2),
         Symptom(name='موت النبات بالكامل، خصوصًا في الطقس الدافئ والرطب', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def bacterial_wilt_eggplant_full_3(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -894,6 +925,8 @@ class EggplantRules(PlantDiagnosisEngine):
                 Symptom(name='موت النبات بالكامل، خصوصًا في الطقس الدافئ والرطب', cf=MATCH.cf2))
         ),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
     )
     def bacterial_wilt_eggplant_partial_strong(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.65)
@@ -910,6 +943,8 @@ class EggplantRules(PlantDiagnosisEngine):
             Symptom(name='موت النبات بالكامل، خصوصًا في الطقس الدافئ والرطب', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def bacterial_wilt_eggplant_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -918,7 +953,7 @@ class EggplantRules(PlantDiagnosisEngine):
         self.declare(Fact(disease="الذبول البكتيري"))
 
 
-    @Rule(Fact(disease="الذبول البكتيري"))
+    @Rule(Fact(disease="الذبول البكتيري"), salience=5)
     def bacterial_wilt_eggplant_treatment(self):
         print("\n📌 المسبب: مرض الذبول البكتيري في الباذنجان يُسببه البكتيريا Ralstonia solanacearum.")
         print("\n💡 العلاج (مرض الذبول البكتيري - الباذنجان):")
@@ -937,6 +972,8 @@ class EggplantRules(PlantDiagnosisEngine):
         Symptom(name='تظهر بقع بنية على الأوعية الوعائية داخل الساق عند تقطيعها', cf=MATCH.cf2),
         Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def verticillium_wilt_full_3(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -954,6 +991,8 @@ class EggplantRules(PlantDiagnosisEngine):
                 Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf2))
         ),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
     )
     def verticillium_wilt_partial_strong(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.65)
@@ -980,7 +1019,7 @@ class EggplantRules(PlantDiagnosisEngine):
         self.halt(),
 
 
-    @Rule(Fact(disease="الذبول الفيوزاريومي"))
+    @Rule(Fact(disease="الذبول الفيوزاريومي"), salience=5)
     def verticillium_wilt_treatment(self):
         print("\n📌 المسبب: مرض الذبول الفيوزاريومي في الباذنجان يُسببه الفطر Fusarium oxysporum f. sp. melongenae.")
         print("\n💡 العلاج (مرض الذبول الفيوزاريومي - الباذنجان):")
@@ -999,6 +1038,8 @@ class EggplantRules(PlantDiagnosisEngine):
         Symptom(name='تعفن الساقين عند قاعدة النبات، مع ظهور طبقة بيضاء زغبية', cf=MATCH.cf2),
         Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def phytophthora_blight_full_3(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -1016,6 +1057,8 @@ class EggplantRules(PlantDiagnosisEngine):
                 Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf2))
         ),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
     )
     def phytophthora_blight_partial_strong(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.65)
@@ -1031,7 +1074,7 @@ class EggplantRules(PlantDiagnosisEngine):
             Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60),
-        salience=5
+        salience=10
     )
     def phytophthora_blight_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -1041,7 +1084,7 @@ class EggplantRules(PlantDiagnosisEngine):
         self.halt()
 
 
-    @Rule(Fact(disease="عفن الفاكهة والفيوغثور"))
+    @Rule(Fact(disease="عفن الفاكهة والفيوغثور"), salience=5)
     def phytophthora_blight_treatment(self):
         print("\n📌 المسبب: مرض عفن الفاكهة والفيوغثور في الباذنجان يُسببه الفطر Phytophthora capsici.")
         print("\n💡 العلاج (مرض عفن الفاكهة والفيوغثور - الباذنجان):")
@@ -1061,6 +1104,8 @@ class EggplantRules(PlantDiagnosisEngine):
         Symptom(name='انثقاب البقع وتحولها إلى "ثقوب" عند تقدم الإصابة', cf=MATCH.cf2),
         Symptom(name='تساقط الأوراق وضعف التمثيل الضوئي', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def cercospora_leaf_spot_full_3(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -1078,6 +1123,8 @@ class EggplantRules(PlantDiagnosisEngine):
                 Symptom(name='تساقط الأوراق وضعف التمثيل الضوئي', cf=MATCH.cf2))
         ),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
     )
     def cercospora_leaf_spot_partial_strong(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.65)
@@ -1093,6 +1140,8 @@ class EggplantRules(PlantDiagnosisEngine):
             Symptom(name='تساقط الأوراق وضعف التمثيل الضوئي', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def cercospora_leaf_spot_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -1101,7 +1150,7 @@ class EggplantRules(PlantDiagnosisEngine):
         self.declare(Fact(disease="تبقّع الأوراق"))
 
 
-    @Rule(Fact(disease="تبقّع الأوراق"))
+    @Rule(Fact(disease="تبقّع الأوراق"), salience=5)
     def cercospora_leaf_spot_treatment(self):
         print("\n📌 المسبب: مرض تبقّع الأوراق في الباذنجان يُسببه الفطر Alternaria solani.")
         print("\n💡 العلاج (مرض تبقّع الأوراق - Cercospora):")
@@ -1120,6 +1169,8 @@ class EggplantRules(PlantDiagnosisEngine):
         Symptom(name='ظهور شبكة من الفطريات البيضاء وثم "جذور سوداء" (sclerotia)', cf=MATCH.cf2),
         Symptom(name='ذبول وموت مفاجئ للنبات حتى في الطقس المعتدل', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def sclerotium_rot_full_3(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -1137,6 +1188,8 @@ class EggplantRules(PlantDiagnosisEngine):
                 Symptom(name='ذبول وموت مفاجئ للنبات حتى في الطقس المعتدل', cf=MATCH.cf2))
         ),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
     )
     def sclerotium_rot_partial_strong(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.65)
@@ -1152,6 +1205,8 @@ class EggplantRules(PlantDiagnosisEngine):
             Symptom(name='ذبول وموت مفاجئ للنبات حتى في الطقس المعتدل', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def sclerotium_rot_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -1160,7 +1215,7 @@ class EggplantRules(PlantDiagnosisEngine):
         self.declare(Fact(disease="عفن الساق"))
 
 
-    @Rule(Fact(disease="عفن الساق"))
+    @Rule(Fact(disease="عفن الساق"), salience=5)
     def sclerotium_rot_treatment(self):
         print("\n📌 المسبب: مرض عفن الساق في الباذنجان يُسببه الفطر Rhizoctonia solani.")
         print("\n💡 العلاج (مرض عفن الساق - Sclerotium Rot):")
@@ -1223,7 +1278,7 @@ class GarlicRules(PlantDiagnosisEngine):
     ,
         salience=10
     )
-    def downy_mildew_weak(self, cf1):
+    def garlic_downy_mildew_weak(self, cf1):
         final = round(cf1 * 0.45)
         print(f"\n❗ احتمال ضعيف: مرض البياض الزغبي (Peronospora destructor) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
@@ -1522,7 +1577,8 @@ class GrapeRules(PlantDiagnosisEngine):
         Symptom(name='نمو أبيض قطني تحت الأوراق', cf=MATCH.cf2),
         Symptom(name='ذبول الأوراق وسقوطها', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60),
-
+    
+        salience=30
     )
     def downy_mildew_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -1542,7 +1598,7 @@ class GrapeRules(PlantDiagnosisEngine):
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
 
         ),
-        salience=11
+        salience=20
 
     )
     def downy_mildew_partial(self, cf1=0, cf2=0):
@@ -1550,7 +1606,6 @@ class GrapeRules(PlantDiagnosisEngine):
         print(f"\n⚠️ تشخيص مبدئي: البياض الزغبي (العنب) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
         self.declare(Fact(disease="البياض الزغبي"))
-        self.halt()
 
 
 
@@ -1569,10 +1624,9 @@ class GrapeRules(PlantDiagnosisEngine):
         print(f"\n❗ احتمال ضعيف: البياض الزغبي (العنب) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
         self.declare(Fact(disease="البياض الزغبي"))
-        self.halt()
 
 
-    @Rule(Fact(disease="البياض الزغبي"))
+    @Rule(Fact(disease="البياض الزغبي"), salience=5)
     def downy_mildew_treatment(self):
         print("\n📌 المسبب: مرض البياض الزغبي في العنب يُسببه الفطر Plasmopara viticola.")
         print("\n💡 العلاج (البياض الزغبي - العنب):")
@@ -1589,6 +1643,8 @@ class GrapeRules(PlantDiagnosisEngine):
         Symptom(name='تعفن طري على الثمار', cf=MATCH.cf2),
         Symptom(name='وجود زغب رمادي اللون', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def gray_mold_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -1607,6 +1663,8 @@ class GrapeRules(PlantDiagnosisEngine):
                 Symptom(name='وجود زغب رمادي اللون', cf=MATCH.cf2),
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
         )
+    ,
+        salience=20
     )
     def gray_mold_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
@@ -1621,6 +1679,8 @@ class GrapeRules(PlantDiagnosisEngine):
             Symptom(name='وجود زغب رمادي اللون', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def gray_mold_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -1628,7 +1688,7 @@ class GrapeRules(PlantDiagnosisEngine):
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
         self.declare(Fact(disease="العفن الرمادي"))
 
-    @Rule(Fact(disease="العفن الرمادي"))
+    @Rule(Fact(disease="العفن الرمادي"), salience=5)
     def gray_mold_treatment(self):
         print("\n📌 المسبب: مرض العفن الرمادي في العنب يُسببه الفطر Botrytis cinerea.")
         print("\n💡 العلاج (العفن الرمادي - العنب):")
@@ -1647,6 +1707,8 @@ class GrapeRules(PlantDiagnosisEngine):
         Symptom(name='تشوه الثمار وتوقف نموها', cf=MATCH.cf2),
         Symptom(name='تشقق الثمار وتلفها', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def grape_powdery_mildew_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -1665,6 +1727,8 @@ class GrapeRules(PlantDiagnosisEngine):
                 Symptom(name='تشقق الثمار وتلفها', cf=MATCH.cf2),
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
         )
+    ,
+        salience=20
     )
     def grape_powdery_mildew_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
@@ -1679,6 +1743,8 @@ class GrapeRules(PlantDiagnosisEngine):
             Symptom(name='تشقق الثمار وتلفها', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def grape_powdery_mildew_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -1686,7 +1752,7 @@ class GrapeRules(PlantDiagnosisEngine):
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
         self.declare(Fact(disease="البياض الدقيقي - العنب"))
 
-    @Rule(Fact(disease="البياض الدقيقي - العنب"))
+    @Rule(Fact(disease="البياض الدقيقي - العنب"), salience=5)
     def grape_powdery_mildew_treatment(self):
         print("\n📌 المسبب: مرض البياض الدقيقي في العنب يُسببه الفطر Erysiphe necator.")
         print("\n💡 العلاج (البياض الدقيقي - العنب):")
@@ -1704,6 +1770,8 @@ class GrapeRules(PlantDiagnosisEngine):
         Symptom(name='بقع صفراء على الأوراق', cf=MATCH.cf2),
         Symptom(name='توقف نمو النبات أو موته المفاجئ', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60),
+    ,
+        salience=30
     )
     def root_rot_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.9)
@@ -1723,7 +1791,7 @@ class GrapeRules(PlantDiagnosisEngine):
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
         ),
 
-        salience = 6
+        salience=20
 
     )
     def root_rot_partial(self, cf1=0, cf2=0):
@@ -1731,7 +1799,6 @@ class GrapeRules(PlantDiagnosisEngine):
         print(f"\n⚠️ تشخيص مبدئي: عفن الجذور (العنب) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
         self.declare(Fact(disease="عفن الجذور"))
-        self.halt()
 
 
     @Rule(
@@ -1741,17 +1808,16 @@ class GrapeRules(PlantDiagnosisEngine):
             Symptom(name='توقف نمو النبات أو موته المفاجئ', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60),
-        salience=5
+        salience=10
     )
     def root_rot_weak(self, cf1):
         final = round(cf1 * 0.45)
         print(f"\n❗ احتمال ضعيف: عفن الجذور (العنب) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
         self.declare(Fact(disease="عفن الجذور"))
-        self.halt()
 
 
-    @Rule(Fact(disease="عفن الجذور"))
+    @Rule(Fact(disease="عفن الجذور"), salience=5)
     def root_rot_treatment(self):
         print("\n📌 المسبب: مرض عفن الجذور في العنب يُسببه الفطر Phytophthora spp.")
         print("\n💡 العلاج (عفن الجذور - العنب):")
@@ -1760,6 +1826,30 @@ class GrapeRules(PlantDiagnosisEngine):
         print("- إزالة النباتات المصابة بالكامل لمنع الانتشار")
         print("- يمكن استخدام مبيدات فطرية مثل Metalaxyl حسب توصيات المختصين")
         self.halt()
+</file>
+
+<file path="LICENSE">
+MIT License
+
+Copyright (c) 2026 Elias Nadder
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 </file>
 
 <file path="main.py">
@@ -2069,7 +2159,7 @@ class OnionRules(PlantDiagnosisEngine):
         self.declare(Fact(disease="البيرونوسبورا"))
 
 
-    @Rule(Fact(disease="البياض الزغبي"), salience=5)
+    @Rule(Fact(disease="البيرونوسبورا"), salience=5)
     def peronospora_destructor_treatment(self):
         print("\n💡 العلاج (مرض البياض الزغبي - البصل):")
         print("\n📌 المسبب: مرض البياض الزغبي في البصل يُسببه الفطر Peronospora destructor.")
@@ -2365,7 +2455,7 @@ class PotatoRules(PlantDiagnosisEngine):
     ,
         salience=30
     )
-    def late_blight_full(self, cf1, cf2, cf3):
+    def potato_late_blight_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
         print(f"\n✅ التشخيص: اللفحة المتأخرة (درجة الثقة: {final}/100)")
         self.declare(Fact(disease="اللفحة المتأخرة"))
@@ -2379,7 +2469,7 @@ class PotatoRules(PlantDiagnosisEngine):
     ,
         salience=20
     )
-    def late_blight_partial(self, cf1=0, cf2=0):
+    def potato_late_blight_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
         print(f"\n⚠️ تشخيص مبدئي: اللفحة المتأخرة (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
@@ -2395,7 +2485,7 @@ class PotatoRules(PlantDiagnosisEngine):
     ,
         salience=10
     )
-    def late_blight_weak(self, cf1):
+    def potato_late_blight_weak(self, cf1):
         final = round(cf1 * 0.45)
         print(f"\n❗ احتمال ضعيف: اللفحة المتأخرة (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
@@ -2575,6 +2665,423 @@ class PotatoRules(PlantDiagnosisEngine):
             self.halt()
 </file>
 
+<file path="test_project.py">
+"""
+=====================================================================
+سكريبت اختبار شامل — نظام تشخيص أمراض النباتات
+=====================================================================
+يُفحص:
+  1. Syntax  — كل ملف يُحلَّل بدون خطأ
+  2. تكرار أسماء الدوال — لا تكرار بين الملفات
+  3. المخالفات — لا for/while/listcomp/generator داخل @Rule
+  4. salience — كل قاعدة لها أولوية صحيحة
+  5. halt()   — كل قاعدة علاج تنتهي بـ halt()
+  6. تشغيل حي — كل engine يشتغل مع أعراض حقيقية ويُنتج تشخيصاً
+
+طريقة التشغيل:
+  ضع هذا الملف في نفس مجلد المشروع ثم:
+      python test_project.py
+=====================================================================
+"""
+
+import ast
+import re
+import sys
+import os
+import traceback
+
+# ── ألوان الطرفية ──────────────────────────────────────────────────
+GREEN  = "\033[92m"
+RED    = "\033[91m"
+YELLOW = "\033[93m"
+CYAN   = "\033[96m"
+RESET  = "\033[0m"
+BOLD   = "\033[1m"
+
+def ok(msg):   print(f"  {GREEN}✅ {msg}{RESET}")
+def fail(msg): print(f"  {RED}🔴 {msg}{RESET}")
+def warn(msg): print(f"  {YELLOW}⚠️  {msg}{RESET}")
+def section(title):
+    print(f"\n{BOLD}{CYAN}{'='*60}{RESET}")
+    print(f"{BOLD}{CYAN}  {title}{RESET}")
+    print(f"{BOLD}{CYAN}{'='*60}{RESET}")
+
+# ── ملفات المشروع ──────────────────────────────────────────────────
+RULE_FILES = [
+    'apple_rules.py', 'cherry_rules.py', 'citrus_rules.py',
+    'eggplant_rules.py', 'garlic_rules.py', 'grape_rules.py',
+    'onion_rules.py', 'Potato_rules.py', 'tomato_rules.py',
+    'zucchini_rules.py',
+]
+ALL_FILES = RULE_FILES + ['core.py', 'main.py']
+
+results = {'passed': 0, 'failed': 0, 'warnings': 0}
+
+def record(passed, message):
+    if passed:
+        ok(message)
+        results['passed'] += 1
+    else:
+        fail(message)
+        results['failed'] += 1
+
+# ══════════════════════════════════════════════════════════════════
+# TEST 1 — Syntax
+# ══════════════════════════════════════════════════════════════════
+section("TEST 1 — Syntax (كل ملف يُقرأ بدون خطأ)")
+
+for fname in ALL_FILES:
+    if not os.path.exists(fname):
+        fail(f"{fname}: الملف غير موجود!")
+        results['failed'] += 1
+        continue
+    try:
+        with open(fname, encoding='utf-8') as f:
+            source = f.read()
+        ast.parse(source)
+        record(True, f"{fname}")
+    except SyntaxError as e:
+        record(False, f"{fname}: SyntaxError سطر {e.lineno} — {e.msg}")
+    except Exception as e:
+        record(False, f"{fname}: {e}")
+
+# ══════════════════════════════════════════════════════════════════
+# TEST 2 — تكرار أسماء الدوال
+# ══════════════════════════════════════════════════════════════════
+section("TEST 2 — لا تكرار في أسماء دوال @Rule")
+
+all_funcs = {}
+for fname in RULE_FILES:
+    if not os.path.exists(fname): continue
+    with open(fname, encoding='utf-8') as f:
+        source = f.read()
+    for m in re.finditer(r'^\s{4}def (\w+)\s*\(', source, re.MULTILINE):
+        fn = m.group(1)
+        all_funcs.setdefault(fn, []).append(fname)
+
+dups = {k: v for k, v in all_funcs.items() if len(v) > 1}
+if dups:
+    for fn, fnames in sorted(dups.items()):
+        record(False, f"'{fn}' مكررة في: {', '.join(fnames)}")
+else:
+    record(True, f"كل {len(all_funcs)} دالة فريدة")
+
+# ══════════════════════════════════════════════════════════════════
+# TEST 3 — لا مخالفات للحلقات داخل @Rule
+# ══════════════════════════════════════════════════════════════════
+section("TEST 3 — لا for/while/listcomp/generator داخل @Rule")
+
+FORBIDDEN_PATTERNS = [
+    (r'\[.*\bfor\b.*\]',            'list comprehension'),
+    (r'(min|max)\s*\(.*\bfor\b.*\)','generator في min/max'),
+    (r'^\s+(for |while )',           'حلقة for/while'),
+    (r'\*\*kwargs',                  '**kwargs'),
+]
+
+total_violations = 0
+for fname in RULE_FILES:
+    if not os.path.exists(fname): continue
+    with open(fname, encoding='utf-8') as f:
+        lines = f.readlines()
+
+    in_body = False
+    indent_level = None
+    file_violations = []
+
+    for lineno, line in enumerate(lines, 1):
+        s = line.strip()
+        if not s or s.startswith('#'): continue
+
+        if s.startswith('@Rule'):
+            in_body = True
+            continue
+        if in_body and s.startswith('def '):
+            indent_level = len(line) - len(line.lstrip())
+            in_body = 'body'
+            continue
+        if in_body == 'body':
+            curr = len(line) - len(line.lstrip()) if line.strip() else 999
+            if curr <= indent_level and line.strip():
+                in_body = False
+                continue
+            for pattern, label in FORBIDDEN_PATTERNS:
+                if re.search(pattern, line):
+                    file_violations.append((lineno, label, s[:60]))
+                    break
+
+    if file_violations:
+        total_violations += len(file_violations)
+        for lineno, label, code in file_violations:
+            record(False, f"[{fname}] سطر {lineno} | {label}: {code}")
+    else:
+        record(True, f"{fname}: نظيف")
+
+if total_violations == 0:
+    ok(f"إجمالي المخالفات: 0")
+
+# ══════════════════════════════════════════════════════════════════
+# TEST 4 — salience صحيح
+# ══════════════════════════════════════════════════════════════════
+section("TEST 4 — salience موجود وصحيح في كل قاعدة")
+
+VALID_SALIENCE = {5, 10, 20, 30}   # القيم المقبولة
+
+for fname in RULE_FILES:
+    if not os.path.exists(fname): continue
+    with open(fname, encoding='utf-8') as f:
+        source = f.read()
+
+    # استخراج كل @Rule مع salience
+    rules_sal = re.findall(r'salience\s*=\s*(-?\d+)', source)
+    rule_count = source.count('@Rule(')
+
+    if not rules_sal:
+        record(False, f"{fname}: لا يوجد salience في أي قاعدة")
+        continue
+
+    wrong = [int(v) for v in rules_sal if int(v) not in VALID_SALIENCE]
+    missing = rule_count - len(rules_sal)
+
+    if wrong:
+        warn(f"{fname}: قيم salience غير متوقعة: {list(set(wrong))}")
+        results['warnings'] += 1
+    if missing > 0:
+        record(False, f"{fname}: {missing} قاعدة بدون salience")
+    else:
+        record(True, f"{fname}: {rule_count} قاعدة ← salience: {sorted(set(int(v) for v in rules_sal))}")
+
+# ══════════════════════════════════════════════════════════════════
+# TEST 5 — قواعد العلاج تنتهي بـ halt()
+# ══════════════════════════════════════════════════════════════════
+section("TEST 5 — كل قاعدة علاج (Fact(disease=...)) تنتهي بـ halt()")
+
+for fname in RULE_FILES:
+    if not os.path.exists(fname): continue
+    with open(fname, encoding='utf-8') as f:
+        lines = f.readlines()
+
+    in_treatment = False
+    indent_level = None
+    body_lines = []
+    current_def = ""
+    no_halt = []
+
+    for lineno, line in enumerate(lines, 1):
+        s = line.strip()
+
+        if "@Rule(Fact(disease=" in s or "@Rule(\n" in s:
+            pass  # نتعامل مع decorator متعدد الأسطر
+
+        # كشف treatment rule: @Rule التي تحتوي Fact(disease=
+        if s.startswith('@Rule') and 'Fact(disease=' in s:
+            in_treatment = True
+            body_lines = []
+            continue
+
+        if in_treatment and s.startswith('def '):
+            current_def = s
+            indent_level = len(line) - len(line.lstrip())
+            body_lines = []
+            in_treatment = 'body'
+            continue
+
+        if in_treatment == 'body':
+            curr = len(line) - len(line.lstrip()) if line.strip() else 999
+            if curr <= indent_level and line.strip() and not line.strip().startswith('#'):
+                # نهاية الدالة
+                has_halt = any('self.halt()' in bl for bl in body_lines)
+                if not has_halt:
+                    no_halt.append(current_def[:50])
+                in_treatment = False
+                body_lines = []
+            else:
+                body_lines.append(line)
+
+    if no_halt:
+        for d in no_halt:
+            record(False, f"{fname}: بدون halt() → {d}")
+    else:
+        record(True, f"{fname}: كل قواعد العلاج تنتهي بـ halt()")
+
+# ══════════════════════════════════════════════════════════════════
+# TEST 6 — تشغيل حي لكل engine
+# ══════════════════════════════════════════════════════════════════
+section("TEST 6 — تشغيل حي (كل engine يُنتج تشخيصاً)")
+
+# أعراض اختبارية مضمونة لكل نبات (cf=90 لضمان التفعيل)
+TEST_CASES = {
+    'apple_rules.py': {
+        'class': 'AppleRules',
+        'symptoms': [
+            ('بقع زيتية على الأوراق', 90),
+            ('تشوه الثمار', 90),
+            ('تقشر لون الأوراق', 90),
+        ],
+        'expected_disease': 'جرب التفاح',
+    },
+    'cherry_rules.py': {
+        'class': 'CherryRules',
+        'symptoms': [
+            ('بقع بيضاء على سطح الأوراق', 90),
+            ('تشوه الأوراق', 90),
+            ('تبقع وتلف الثمار', 90),
+        ],
+        'expected_disease': 'البياض الدقيقي',
+    },
+    'grape_rules.py': {
+        'class': 'GrapeRules',
+        'symptoms': [
+            ('بقع صفراء على الأوراق', 90),
+            ('نمو أبيض قطني تحت الأوراق', 90),
+            ('ذبول الأوراق وسقوطها', 90),
+        ],
+        'expected_disease': None,  # أي تشخيص مقبول
+    },
+    'tomato_rules.py': {
+        'class': 'TomatoRules',
+        'symptoms': [
+            ('هالات صفراء حول البقع', 90),
+            ('ذبول الأوراق السفلية', 90),
+            ('بقع بنية مائية على حواف الأوراق', 90),
+        ],
+        'expected_disease': None,
+    },
+    'Potato_rules.py': {
+        'class': 'PotatoRules',
+        'symptoms': [
+            ('بقع مائية داكنة على الأوراق', 90),
+            ('هالات خضراء إلى بنية على الساق', 90),
+            ('تعفن بني على الدرنات', 90),
+        ],
+        'expected_disease': None,
+    },
+    'citrus_rules.py': {
+        'class': 'CitrusRules',
+        'symptoms': [
+            ('اصفرار وتمدد للأوراق والشعيرات الخشبية', 90),
+            ('ذبول وفناء أجزاء من الفروع', 90),
+            ('إفرازات صمغية وردية أو رمادية في الجذوع', 90),
+        ],
+        'expected_disease': None,
+    },
+    'zucchini_rules.py': {
+        'class': 'ZucchiniRules',
+        'symptoms': [
+            ('فسيفساء (mosaic) وتبقع أصفر على الأوراق', 90),
+            ('تشوه وتقزز أوراق الكوسا', 90),
+            ('ثمار مشوّهة أو ملوّنة وغير منتظمة', 90),
+        ],
+        'expected_disease': None,
+    },
+    'eggplant_rules.py': {
+        'class': 'EggplantRules',
+        'symptoms': [
+            ('ذبول مفاجئ للنبات بدون اصفرار سابق', 90),
+            ('تحول الساق الداخلي إلى اللون البني – يظهر عند قطع الجذع انسياب سائل مخاطي', 90),
+            ('موت النبات بالكامل، خصوصًا في الطقس الدافئ والرطب', 90),
+        ],
+        'expected_disease': None,
+    },
+    'onion_rules.py': {
+        'class': 'OnionRules',
+        'symptoms': [
+            ('بقع صفراء باهتة أو بنية طويلة على الأوراق الخارجية قد تتحول إلى نمو رمادي-بنفسجي تحت الرطوبة', 90),
+            ('ذبول الأوراق المصابة وانحناؤها أو تساقطها', 90),
+            ('البصليات تصبح طرية ومائية بسبب المرض', 90),
+        ],
+        'expected_disease': None,
+    },
+    'garlic_rules.py': {
+        'class': 'GarlicRules',
+        'symptoms': [
+            ('اصفرار الأوراق من الأطراف نحو القاعدة', 90),
+            ('ظهور نمو رمادي مزرق على السطح السفلي للأوراق', 90),
+            ('تدهور مبكر للنباتات وسقوط الأوراق', 90),
+        ],
+        'expected_disease': None,
+    },
+}
+
+# استيراد مكتبات experta
+try:
+    import collections.abc
+    import collections
+    collections.Mapping = collections.abc.Mapping
+    collections.MutableMapping = collections.abc.MutableMapping
+    collections.Callable = collections.abc.Callable
+    from experta import KnowledgeEngine, Fact
+    experta_ok = True
+except ImportError:
+    warn("experta غير مُثبَّتة — تخطي TEST 6")
+    warn("لتثبيتها: pip install experta")
+    experta_ok = False
+
+if experta_ok:
+    import importlib.util, io, contextlib
+
+    def load_class(fname, classname):
+        spec = importlib.util.spec_from_file_location(fname[:-3], fname)
+        mod  = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return getattr(mod, classname)
+
+    for fname, tc in TEST_CASES.items():
+        if not os.path.exists(fname):
+            warn(f"{fname}: الملف غير موجود — تخطي")
+            continue
+        try:
+            EngineClass = load_class(fname, tc['class'])
+
+            # الإمساك بـ stdout لمنع الطباعة
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                from core import Symptom
+                engine = EngineClass()
+                engine.reset()
+                for sym_name, cf in tc['symptoms']:
+                    engine.declare(Symptom(name=sym_name, cf=cf))
+                engine.run()
+
+            output = buf.getvalue()
+            got_diagnosis = '✅' in output or '⚠️' in output or '❗' in output
+            got_treatment  = '💡' in output
+
+            if tc['expected_disease']:
+                found = tc['expected_disease'] in output
+                record(found and got_treatment,
+                       f"{fname} → {'تشخيص صحيح ✓' if found else 'تشخيص خاطئ ✗'} | علاج: {'✓' if got_treatment else '✗'}")
+            else:
+                record(got_diagnosis and got_treatment,
+                       f"{fname} → تشخيص: {'✓' if got_diagnosis else '✗'} | علاج: {'✓' if got_treatment else '✗'}")
+
+        except Exception as e:
+            record(False, f"{fname}: خطأ أثناء التشغيل — {e}")
+            if '--verbose' in sys.argv:
+                traceback.print_exc()
+
+# ══════════════════════════════════════════════════════════════════
+# النتيجة النهائية
+# ══════════════════════════════════════════════════════════════════
+section("النتيجة النهائية")
+
+total = results['passed'] + results['failed']
+pct   = round(results['passed'] / total * 100) if total else 0
+
+print(f"\n  {GREEN}✅ ناجح   : {results['passed']}{RESET}")
+print(f"  {RED}🔴 فاشل   : {results['failed']}{RESET}")
+if results['warnings']:
+    print(f"  {YELLOW}⚠️  تحذيرات: {results['warnings']}{RESET}")
+print(f"\n  {'✅' if results['failed'] == 0 else '❌'} "
+      f"{BOLD}النسبة: {pct}% ({results['passed']}/{total}){RESET}")
+
+if results['failed'] > 0:
+    print(f"\n  {RED}المشروع يحتاج إصلاحات. راجع الفشل بالأعلى.{RESET}")
+    sys.exit(1)
+else:
+    print(f"\n  {GREEN}المشروع اجتاز جميع الاختبارات.{RESET}")
+    sys.exit(0)
+</file>
+
 <file path="tomato_rules.py">
 from experta import Rule, Fact, MATCH, TEST, OR, AND
 from core import Symptom, PlantDiagnosisEngine
@@ -2587,6 +3094,8 @@ class TomatoRules(PlantDiagnosisEngine):
         Symptom(name='هالات صفراء حول البقع', cf=MATCH.cf2),
         Symptom(name='ذبول الأوراق السفلية', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def early_blight_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -2605,6 +3114,8 @@ class TomatoRules(PlantDiagnosisEngine):
                 Symptom(name='ذبول الأوراق السفلية', cf=MATCH.cf2),
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
         )
+    ,
+        salience=20
     )
     def early_blight_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
@@ -2619,16 +3130,15 @@ class TomatoRules(PlantDiagnosisEngine):
             Symptom(name='ذبول الأوراق السفلية', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60),
-        salience=5,
+        salience=10,
     )
     def early_blight_weak(self, cf1):
         final = round(cf1 * 0.45)
         print(f"\n❗ احتمال ضعيف: اللفحة المبكرة (الطماطم) (درجة الثقة: {final}/100)")
         print("⚠️ يُنصح بإدخال المزيد من الأعراض لتأكيد التشخيص بسبب التشابه مع أعراض مرض آخر")
         self.declare(Fact(disease="اللفحة المبكرة"))
-        self.halt()
 
-    @Rule(Fact(disease="اللفحة المبكرة"))
+    @Rule(Fact(disease="اللفحة المبكرة"), salience=5)
     def early_blight_treatment(self):
         print("\n📌 المسبب: مرض اللفحة المبكرة في الطماطم يُسببه الفطر Alternaria solani.")
         print("\n💡 العلاج (اللفحة المبكرة - الطماطم):")
@@ -2646,6 +3156,8 @@ class TomatoRules(PlantDiagnosisEngine):
         Symptom(name='تعفن بني على السيقان أو الثمار', cf=MATCH.cf2),
         Symptom(name='ظهور زغب رمادي أو أبيض تحت الأوراق', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def late_blight_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -2664,6 +3176,8 @@ class TomatoRules(PlantDiagnosisEngine):
                 Symptom(name='ظهور زغب رمادي أو أبيض تحت الأوراق', cf=MATCH.cf2),
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
         )
+    ,
+        salience=20
     )
     def late_blight_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
@@ -2685,9 +3199,8 @@ class TomatoRules(PlantDiagnosisEngine):
         print(f"\n❗ احتمال ضعيف: اللفحة المتأخرة (الطماطم) (درجة الثقة: {final}/100)")
         print("⚠️ يُنصح بإدخال المزيد من الأعراض لتأكيد التشخيص بسبب التشابه مع أعراض مرض آخر.")
         self.declare(Fact(disease="اللفحة المتأخرة"))
-        self.halt()
 
-    @Rule(Fact(disease="اللفحة المتأخرة"))
+    @Rule(Fact(disease="اللفحة المتأخرة"), salience=5)
     def late_blight_treatment(self):
         print("\n📌 المسبب: مرض اللفحة المتأخرة في الطماطم يُسببه الفطر Phytophthora infestans.")
         print("\n💡 العلاج (اللفحة المتأخرة - الطماطم):")
@@ -2704,6 +3217,8 @@ class TomatoRules(PlantDiagnosisEngine):
         Symptom(name='لا يظهر تعفن على الساق', cf=MATCH.cf2),
         Symptom(name='إفرازات مخاطية من قاعدة الساق', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def bacterial_wilt_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -2722,6 +3237,8 @@ class TomatoRules(PlantDiagnosisEngine):
                 Symptom(name='إفرازات مخاطية من قاعدة الساق', cf=MATCH.cf2),
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
         )
+    ,
+        salience=20
     )
     def bacterial_wilt_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
@@ -2736,6 +3253,8 @@ class TomatoRules(PlantDiagnosisEngine):
             Symptom(name='إفرازات مخاطية من قاعدة الساق', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def bacterial_wilt_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -2743,7 +3262,7 @@ class TomatoRules(PlantDiagnosisEngine):
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين دقة التشخيص.")
         self.declare(Fact(disease="الذبول البكتيري"))
 
-    @Rule(Fact(disease="الذبول البكتيري"))
+    @Rule(Fact(disease="الذبول البكتيري"), salience=5)
     def bacterial_wilt_treatment(self):
         print("\n📌 المسبب: مرض الذبول البكتيري في الطماطم يُسببه البكتيريا Ralstonia solanacearum.")
         print("\n💡 العلاج (الذبول البكتيري - الطماطم):")
@@ -2761,6 +3280,8 @@ class TomatoRules(PlantDiagnosisEngine):
         Symptom(name='تشقق الجلد على الثمار', cf=MATCH.cf2),
         Symptom(name='تساقط الأوراق', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def bacterial_spot_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -2779,6 +3300,8 @@ class TomatoRules(PlantDiagnosisEngine):
                 Symptom(name='تساقط الأوراق', cf=MATCH.cf2),
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
         )
+    ,
+        salience=20
     )
     def bacterial_spot_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
@@ -2793,6 +3316,8 @@ class TomatoRules(PlantDiagnosisEngine):
             Symptom(name='تساقط الأوراق', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def bacterial_spot_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -2800,7 +3325,7 @@ class TomatoRules(PlantDiagnosisEngine):
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="تبقع الأوراق البكتيري"))
 
-    @Rule(Fact(disease="تبقع الأوراق البكتيري"))
+    @Rule(Fact(disease="تبقع الأوراق البكتيري"), salience=5)
     def bacterial_spot_treatment(self):
         print("\n📌 المسبب: مرض تبقّع الأوراق البكتيري في الطماطم يُسببه البكتيريا Xanthomonas vesicatoria.")
         print("\n💡 العلاج (تبقع الأوراق البكتيري - الطماطم):")
@@ -2816,6 +3341,8 @@ class TomatoRules(PlantDiagnosisEngine):
         Symptom(name='بقعة سوداء غائرة في أسفل الثمرة', cf=MATCH.cf1),
         Symptom(name='تصبح قاسية وجافة', cf=MATCH.cf2),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=30
     )
     def blossom_end_rot_full(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.85)
@@ -2829,6 +3356,8 @@ class TomatoRules(PlantDiagnosisEngine):
             Symptom(name='تصبح قاسية وجافة', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def blossom_end_rot_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -2836,7 +3365,7 @@ class TomatoRules(PlantDiagnosisEngine):
         print("⚠️ يُفضل إدخال العرض الثاني لتأكيد التشخيص.")
         self.declare(Fact(disease="عفن الطرف الزهري"))
 
-    @Rule(Fact(disease="عفن الطرف الزهري"))
+    @Rule(Fact(disease="عفن الطرف الزهري"), salience=5)
     def blossom_end_rot_treatment(self):
         print("\n📌 المسبب: مرض عفن الطرف الزهري في الطماطم يُسببه الفطر Botrytis cinerea.")
         print("\n💡 العلاج (عفن الطرف الزهري - الطماطم):")
@@ -2855,6 +3384,8 @@ class TomatoRules(PlantDiagnosisEngine):
         Symptom(name='تشوه شكل الأوراق', cf=MATCH.cf2),
         Symptom(name='صغر حجم الثمار', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def tomato_mosaic_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -2873,6 +3404,8 @@ class TomatoRules(PlantDiagnosisEngine):
                 Symptom(name='صغر حجم الثمار', cf=MATCH.cf2),
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
         )
+    ,
+        salience=20
     )
     def tomato_mosaic_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
@@ -2887,6 +3420,8 @@ class TomatoRules(PlantDiagnosisEngine):
             Symptom(name='صغر حجم الثمار', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def tomato_mosaic_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -2894,7 +3429,7 @@ class TomatoRules(PlantDiagnosisEngine):
         print("⚠️ يُنصح بإدخال عرضين أو أكثر لتأكيد التشخيص.")
         self.declare(Fact(disease="موزاييك الطماطم"))
 
-    @Rule(Fact(disease="موزاييك الطماطم"))
+    @Rule(Fact(disease="موزاييك الطماطم"), salience=5)
     def tomato_mosaic_treatment(self):
         print("\n📌 المسبب: فيروس موزاييك الطماطم (Tomato Mosaic Virus) - ToMV")
         print("\n💡 العلاج (موزاييك الطماطم - ToMV):")
@@ -3091,7 +3626,7 @@ class ZucchiniRules(PlantDiagnosisEngine):
     ,
         salience=10
     )
-    def bacterial_wilt_weak(self, cf1):
+    def zucchini_bacterial_wilt_weak(self, cf1):
         final = round(cf1 * 0.45)
         print(f"\n❗ احتمال ضعيف: مرض الذبول البكتيري (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")

@@ -22,11 +22,9 @@ class AppleRules(PlantDiagnosisEngine):
             AND(Symptom(name='بقع زيتية على الأوراق', cf=MATCH.cf1),
                 Symptom(name='تشوه الثمار', cf=MATCH.cf2),
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
-
             AND(Symptom(name='بقع زيتية على الأوراق', cf=MATCH.cf1),
                 Symptom(name='تقشر لون الأوراق', cf=MATCH.cf3),
                 TEST(lambda cf1, cf3: min(cf1, cf3) >= 60)),
-
             AND(Symptom(name='تشوه الثمار', cf=MATCH.cf2),
                 Symptom(name='تقشر لون الأوراق', cf=MATCH.cf3),
                 TEST(lambda cf2, cf3: min(cf2, cf3) >= 60))
@@ -35,7 +33,7 @@ class AppleRules(PlantDiagnosisEngine):
         salience=20
     )
     def diagnose_apple_scab_partial(self, cf1=0, cf2=0, cf3=0):
-        final_cf = round(min(v for v in [cf1, cf2, cf3] if v > 0) * 0.65)
+        final_cf = round(min(cf1, cf2, cf3) * 0.65)
         print(f"\n⚠️ تشخيص مبدئي: جرب التفاح (درجة الثقة: {final_cf}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="جرب التفاح"))
@@ -66,8 +64,7 @@ class AppleRules(PlantDiagnosisEngine):
         print("- تقليم الأغصان سنويًا")
         self.halt()
 
-        # ______ العفن الأسود _______
-
+    # ---------------- العفن الأسود ----------------
     @Rule(
         Symptom(name='بقع بنفسجية على الأوراق', cf=MATCH.cf1),
         Symptom(name='تقرحات على الأغصان', cf=MATCH.cf2),
@@ -77,7 +74,7 @@ class AppleRules(PlantDiagnosisEngine):
         salience=30
     )
     def br_full(self, cf1, cf2, cf3):
-        final = round(min(cf1, cf2, cf3) *  0.85)
+        final = round(min(cf1, cf2, cf3) * 0.85)
         print(f"\n✅ تشخيص : العفن الأسود (درجة الثقة: {final}/100)")
         self.declare(Fact(disease="العفن الأسود"))
 
@@ -113,12 +110,11 @@ class AppleRules(PlantDiagnosisEngine):
         salience=10
     )
     def br_weak(self, cf1):
-        final = round(cf1 * 0.45 )
+        final = round(cf1 * 0.45)
         print(f"\n❗ احتمال ضعيف: العفن الأسود (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="العفن الأسود"))
 
-    # --- العلاج ---
     @Rule(Fact(disease="العفن الأسود"), salience=5)
     def br_treatment(self):
         print("\n📌 المسبب: مرض العفن الأسود في التفاح يُسببه الفطر Botryosphaeria obtusa.")
@@ -126,9 +122,8 @@ class AppleRules(PlantDiagnosisEngine):
         print("- تقليم وإزالة الثمار/الأغصان المصابة طوال السنة")
         print("- رش Captan أو Polyram كل 10‑14 يوم لمدة 4–6 أسابيع")
         print("- بديل بيولوجي: Trianum Shield حسب الحاجة")
-        print("- تقليم Cankers 15 سم تحت الأنسجة المريضة")
+        print("- تقليم Cankers 15 سم تحت الأنسجة المريضة")
         self.halt()
-
 
     # ---------------- صدأ التفاح الصنوبري ----------------
     @Rule(
@@ -140,7 +135,7 @@ class AppleRules(PlantDiagnosisEngine):
         salience=30
     )
     def cedar_rust_full(self, cf1, cf2, cf3):
-        final = round(min(cf1, cf2, cf3) *  0.85)
+        final = round(min(cf1, cf2, cf3) * 0.85)
         print(f"\n✅ تشخيص : صدأ التفاح الصنوبري (درجة الثقة: {final}/100)")
         self.declare(Fact(disease="صدأ التفاح الصنوبري"))
 

@@ -9,12 +9,13 @@ class EggplantRules(PlantDiagnosisEngine):
         Symptom(name='تحول الساق الداخلي إلى اللون البني – يظهر عند قطع الجذع انسياب سائل مخاطي', cf=MATCH.cf2),
         Symptom(name='موت النبات بالكامل، خصوصًا في الطقس الدافئ والرطب', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def bacterial_wilt_eggplant_full_3(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
         print(f"\n✅ التشخيص: مرض الذبول البكتيري (الباذنجان) (درجة الثقة: {final}/100)")
         self.declare(Fact(disease="الذبول البكتيري"))
-
 
     @Rule(
         OR(
@@ -27,14 +28,14 @@ class EggplantRules(PlantDiagnosisEngine):
                 Symptom(name='موت النبات بالكامل، خصوصًا في الطقس الدافئ والرطب', cf=MATCH.cf2))
         ),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
     )
     def bacterial_wilt_eggplant_partial_strong(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.65)
         print(f"\n⚠️  تشخيص مبدئي: مرض الذبول البكتيري (الباذنجان) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="الذبول البكتيري"))
-
-    #
 
     @Rule(
         OR(
@@ -43,6 +44,8 @@ class EggplantRules(PlantDiagnosisEngine):
             Symptom(name='موت النبات بالكامل، خصوصًا في الطقس الدافئ والرطب', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def bacterial_wilt_eggplant_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -50,8 +53,7 @@ class EggplantRules(PlantDiagnosisEngine):
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
         self.declare(Fact(disease="الذبول البكتيري"))
 
-
-    @Rule(Fact(disease="الذبول البكتيري"))
+    @Rule(Fact(disease="الذبول البكتيري"), salience=5)
     def bacterial_wilt_eggplant_treatment(self):
         print("\n📌 المسبب: مرض الذبول البكتيري في الباذنجان يُسببه البكتيريا Ralstonia solanacearum.")
         print("\n💡 العلاج (مرض الذبول البكتيري - الباذنجان):")
@@ -64,18 +66,18 @@ class EggplantRules(PlantDiagnosisEngine):
 
 
     #الذبول الفيوزاريومي
-
     @Rule(
         Symptom(name='اصفرار الأوراق السفلية تدريجيًا، ثم ذبولها', cf=MATCH.cf1),
         Symptom(name='تظهر بقع بنية على الأوعية الوعائية داخل الساق عند تقطيعها', cf=MATCH.cf2),
         Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def verticillium_wilt_full_3(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
         print(f"\n✅ التشخيص: مرض الذبول الفيوزاريومي (الباذنجان) (درجة الثقة: {final}/100)")
         self.declare(Fact(disease="الذبول الفيوزاريومي"))
-
 
     @Rule(
         OR(
@@ -87,13 +89,14 @@ class EggplantRules(PlantDiagnosisEngine):
                 Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf2))
         ),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
     )
     def verticillium_wilt_partial_strong(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.65)
         print(f"\n⚠️  تشخيص مبدئي: مرض الذبول الفيوزاريومي (الباذنجان) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="الذبول الفيوزاريومي"))
-
 
     @Rule(
         OR(
@@ -103,17 +106,14 @@ class EggplantRules(PlantDiagnosisEngine):
         ),
         TEST(lambda cf1: cf1 >= 60),
         salience=10
-
     )
     def verticillium_wilt_weak(self, cf1):
         final = round(cf1 * 0.45)
         print(f"\n❗ احتمال ضعيف: مرض الذبول الفيوزاريومي (الباذنجان) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
-        self.declare(Fact(disease="الذبول الفيوزاريومي")),
-        self.halt(),
+        self.declare(Fact(disease="الذبول الفيوزاريومي"))
 
-
-    @Rule(Fact(disease="الذبول الفيوزاريومي"))
+    @Rule(Fact(disease="الذبول الفيوزاريومي"), salience=5)
     def verticillium_wilt_treatment(self):
         print("\n📌 المسبب: مرض الذبول الفيوزاريومي في الباذنجان يُسببه الفطر Fusarium oxysporum f. sp. melongenae.")
         print("\n💡 العلاج (مرض الذبول الفيوزاريومي - الباذنجان):")
@@ -126,18 +126,18 @@ class EggplantRules(PlantDiagnosisEngine):
 
 
     #مرض عفن الفاكهة والفيوغثور
-
     @Rule(
         Symptom(name='بقع بنية مائية على الثمار، خاصة في النبات السفلي', cf=MATCH.cf1),
         Symptom(name='تعفن الساقين عند قاعدة النبات، مع ظهور طبقة بيضاء زغبية', cf=MATCH.cf2),
         Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def phytophthora_blight_full_3(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
         print(f"\n✅ التشخيص: مرض عفن الفاكهة والفيوغثور (الباذنجان) (درجة الثقة: {final}/100)")
         self.declare(Fact(disease="عفن الفاكهة والفيوغثور"))
-
 
     @Rule(
         OR(
@@ -149,13 +149,14 @@ class EggplantRules(PlantDiagnosisEngine):
                 Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf2))
         ),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
     )
     def phytophthora_blight_partial_strong(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.65)
         print(f"\n⚠️  تشخيص مبدئي: مرض عفن الفاكهة والفيوغثور (الباذنجان) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="عفن الفاكهة والفيوغثور"))
-
 
     @Rule(
         OR(
@@ -164,17 +165,15 @@ class EggplantRules(PlantDiagnosisEngine):
             Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60),
-        salience=5
+        salience=10
     )
     def phytophthora_blight_weak(self, cf1):
         final = round(cf1 * 0.45)
         print(f"\n❗ احتمال ضعيف: مرض عفن الفاكهة والفيوغثور (الباذنجان) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
         self.declare(Fact(disease="عفن الفاكهة والفيوغثور"))
-        self.halt()
 
-
-    @Rule(Fact(disease="عفن الفاكهة والفيوغثور"))
+    @Rule(Fact(disease="عفن الفاكهة والفيوغثور"), salience=5)
     def phytophthora_blight_treatment(self):
         print("\n📌 المسبب: مرض عفن الفاكهة والفيوغثور في الباذنجان يُسببه الفطر Phytophthora capsici.")
         print("\n💡 العلاج (مرض عفن الفاكهة والفيوغثور - الباذنجان):")
@@ -186,20 +185,19 @@ class EggplantRules(PlantDiagnosisEngine):
         self.halt()
 
 
-
     #تبقع الأوراق
-
     @Rule(
         Symptom(name='بقع دائرية داكنة على الأوراق، غالبًا محاطة بهالة صفراء', cf=MATCH.cf1),
         Symptom(name='انثقاب البقع وتحولها إلى "ثقوب" عند تقدم الإصابة', cf=MATCH.cf2),
         Symptom(name='تساقط الأوراق وضعف التمثيل الضوئي', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def cercospora_leaf_spot_full_3(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
         print(f"\n✅ التشخيص: مرض تبقّع الأوراق (Cercospora) (درجة الثقة: {final}/100)")
         self.declare(Fact(disease="تبقّع الأوراق"))
-
 
     @Rule(
         OR(
@@ -211,13 +209,14 @@ class EggplantRules(PlantDiagnosisEngine):
                 Symptom(name='تساقط الأوراق وضعف التمثيل الضوئي', cf=MATCH.cf2))
         ),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
     )
     def cercospora_leaf_spot_partial_strong(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.65)
         print(f"\n⚠️  تشخيص مبدئي: مرض تبقّع الأوراق (Cercospora) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="تبقّع الأوراق"))
-
 
     @Rule(
         OR(
@@ -226,6 +225,8 @@ class EggplantRules(PlantDiagnosisEngine):
             Symptom(name='تساقط الأوراق وضعف التمثيل الضوئي', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def cercospora_leaf_spot_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -233,8 +234,7 @@ class EggplantRules(PlantDiagnosisEngine):
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
         self.declare(Fact(disease="تبقّع الأوراق"))
 
-
-    @Rule(Fact(disease="تبقّع الأوراق"))
+    @Rule(Fact(disease="تبقّع الأوراق"), salience=5)
     def cercospora_leaf_spot_treatment(self):
         print("\n📌 المسبب: مرض تبقّع الأوراق في الباذنجان يُسببه الفطر Alternaria solani.")
         print("\n💡 العلاج (مرض تبقّع الأوراق - Cercospora):")
@@ -247,18 +247,18 @@ class EggplantRules(PlantDiagnosisEngine):
 
 
     #عفن الساق
-
     @Rule(
         Symptom(name='إعوجاجات وتفحم في قاعدة الساق عند سطح التربة', cf=MATCH.cf1),
         Symptom(name='ظهور شبكة من الفطريات البيضاء وثم "جذور سوداء" (sclerotia)', cf=MATCH.cf2),
         Symptom(name='ذبول وموت مفاجئ للنبات حتى في الطقس المعتدل', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def sclerotium_rot_full_3(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
         print(f"\n✅ التشخيص: مرض عفن الساق (Sclerotium Rot) (درجة الثقة: {final}/100)")
         self.declare(Fact(disease="عفن الساق"))
-
 
     @Rule(
         OR(
@@ -270,13 +270,14 @@ class EggplantRules(PlantDiagnosisEngine):
                 Symptom(name='ذبول وموت مفاجئ للنبات حتى في الطقس المعتدل', cf=MATCH.cf2))
         ),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
     )
     def sclerotium_rot_partial_strong(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.65)
         print(f"\n⚠️  تشخيص مبدئي: مرض عفن الساق (Sclerotium Rot) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="عفن الساق"))
-
 
     @Rule(
         OR(
@@ -285,6 +286,8 @@ class EggplantRules(PlantDiagnosisEngine):
             Symptom(name='ذبول وموت مفاجئ للنبات حتى في الطقس المعتدل', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def sclerotium_rot_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -292,8 +295,7 @@ class EggplantRules(PlantDiagnosisEngine):
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
         self.declare(Fact(disease="عفن الساق"))
 
-
-    @Rule(Fact(disease="عفن الساق"))
+    @Rule(Fact(disease="عفن الساق"), salience=5)
     def sclerotium_rot_treatment(self):
         print("\n📌 المسبب: مرض عفن الساق في الباذنجان يُسببه الفطر Rhizoctonia solani.")
         print("\n💡 العلاج (مرض عفن الساق - Sclerotium Rot):")

@@ -15,7 +15,6 @@ class CherryRules(PlantDiagnosisEngine):
         final = round(min(cf1, cf2, cf3) * 0.85)
         print(f"\n✅ التشخيص: البياض الدقيقي (الكرز) (درجة الثقة: {final}/100)")
         self.declare(Fact(disease="البياض الدقيقي"))
-        self.halt()
 
     @Rule(
         OR(
@@ -37,7 +36,6 @@ class CherryRules(PlantDiagnosisEngine):
         print(f"\n⚠️ تشخيص مبدئي: البياض الدقيقي (الكرز) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="البياض الدقيقي"))
-        self.halt()
 
     @Rule(
         OR(
@@ -53,7 +51,6 @@ class CherryRules(PlantDiagnosisEngine):
         print(f"\n❗ احتمال ضعيف: البياض الدقيقي (الكرز) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="البياض الدقيقي"))
-        self.halt()
 
     @Rule(Fact(disease="البياض الدقيقي"), salience=5)
     def treatment(self):

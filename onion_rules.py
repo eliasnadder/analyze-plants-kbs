@@ -61,7 +61,7 @@ class OnionRules(PlantDiagnosisEngine):
         self.declare(Fact(disease="البيرونوسبورا"))
 
 
-    @Rule(Fact(disease="البياض الزغبي"), salience=5)
+    @Rule(Fact(disease="البيرونوسبورا"), salience=5)
     def peronospora_destructor_treatment(self):
         print("\n💡 العلاج (مرض البياض الزغبي - البصل):")
         print("\n📌 المسبب: مرض البياض الزغبي في البصل يُسببه الفطر Peronospora destructor.")

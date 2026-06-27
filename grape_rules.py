@@ -9,7 +9,8 @@ class GrapeRules(PlantDiagnosisEngine):
         Symptom(name='نمو أبيض قطني تحت الأوراق', cf=MATCH.cf2),
         Symptom(name='ذبول الأوراق وسقوطها', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60),
-
+    
+        salience=30
     )
     def downy_mildew_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -29,7 +30,7 @@ class GrapeRules(PlantDiagnosisEngine):
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
 
         ),
-        salience=11
+        salience=20
 
     )
     def downy_mildew_partial(self, cf1=0, cf2=0):
@@ -37,7 +38,6 @@ class GrapeRules(PlantDiagnosisEngine):
         print(f"\n⚠️ تشخيص مبدئي: البياض الزغبي (العنب) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
         self.declare(Fact(disease="البياض الزغبي"))
-        self.halt()
 
 
 
@@ -56,10 +56,9 @@ class GrapeRules(PlantDiagnosisEngine):
         print(f"\n❗ احتمال ضعيف: البياض الزغبي (العنب) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
         self.declare(Fact(disease="البياض الزغبي"))
-        self.halt()
 
 
-    @Rule(Fact(disease="البياض الزغبي"))
+    @Rule(Fact(disease="البياض الزغبي"), salience=5)
     def downy_mildew_treatment(self):
         print("\n📌 المسبب: مرض البياض الزغبي في العنب يُسببه الفطر Plasmopara viticola.")
         print("\n💡 العلاج (البياض الزغبي - العنب):")
@@ -76,6 +75,8 @@ class GrapeRules(PlantDiagnosisEngine):
         Symptom(name='تعفن طري على الثمار', cf=MATCH.cf2),
         Symptom(name='وجود زغب رمادي اللون', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def gray_mold_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -94,6 +95,8 @@ class GrapeRules(PlantDiagnosisEngine):
                 Symptom(name='وجود زغب رمادي اللون', cf=MATCH.cf2),
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
         )
+    ,
+        salience=20
     )
     def gray_mold_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
@@ -108,6 +111,8 @@ class GrapeRules(PlantDiagnosisEngine):
             Symptom(name='وجود زغب رمادي اللون', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def gray_mold_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -115,7 +120,7 @@ class GrapeRules(PlantDiagnosisEngine):
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
         self.declare(Fact(disease="العفن الرمادي"))
 
-    @Rule(Fact(disease="العفن الرمادي"))
+    @Rule(Fact(disease="العفن الرمادي"), salience=5)
     def gray_mold_treatment(self):
         print("\n📌 المسبب: مرض العفن الرمادي في العنب يُسببه الفطر Botrytis cinerea.")
         print("\n💡 العلاج (العفن الرمادي - العنب):")
@@ -134,6 +139,8 @@ class GrapeRules(PlantDiagnosisEngine):
         Symptom(name='تشوه الثمار وتوقف نموها', cf=MATCH.cf2),
         Symptom(name='تشقق الثمار وتلفها', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def grape_powdery_mildew_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -152,6 +159,8 @@ class GrapeRules(PlantDiagnosisEngine):
                 Symptom(name='تشقق الثمار وتلفها', cf=MATCH.cf2),
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
         )
+    ,
+        salience=20
     )
     def grape_powdery_mildew_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
@@ -166,6 +175,8 @@ class GrapeRules(PlantDiagnosisEngine):
             Symptom(name='تشقق الثمار وتلفها', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def grape_powdery_mildew_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -173,7 +184,7 @@ class GrapeRules(PlantDiagnosisEngine):
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
         self.declare(Fact(disease="البياض الدقيقي - العنب"))
 
-    @Rule(Fact(disease="البياض الدقيقي - العنب"))
+    @Rule(Fact(disease="البياض الدقيقي - العنب"), salience=5)
     def grape_powdery_mildew_treatment(self):
         print("\n📌 المسبب: مرض البياض الدقيقي في العنب يُسببه الفطر Erysiphe necator.")
         print("\n💡 العلاج (البياض الدقيقي - العنب):")
@@ -191,6 +202,8 @@ class GrapeRules(PlantDiagnosisEngine):
         Symptom(name='بقع صفراء على الأوراق', cf=MATCH.cf2),
         Symptom(name='توقف نمو النبات أو موته المفاجئ', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60),
+    
+        salience=30
     )
     def root_rot_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.9)
@@ -210,7 +223,7 @@ class GrapeRules(PlantDiagnosisEngine):
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
         ),
 
-        salience = 6
+        salience=20
 
     )
     def root_rot_partial(self, cf1=0, cf2=0):
@@ -218,7 +231,6 @@ class GrapeRules(PlantDiagnosisEngine):
         print(f"\n⚠️ تشخيص مبدئي: عفن الجذور (العنب) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
         self.declare(Fact(disease="عفن الجذور"))
-        self.halt()
 
 
     @Rule(
@@ -228,17 +240,16 @@ class GrapeRules(PlantDiagnosisEngine):
             Symptom(name='توقف نمو النبات أو موته المفاجئ', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60),
-        salience=5
+        salience=10
     )
     def root_rot_weak(self, cf1):
         final = round(cf1 * 0.45)
         print(f"\n❗ احتمال ضعيف: عفن الجذور (العنب) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
         self.declare(Fact(disease="عفن الجذور"))
-        self.halt()
 
 
-    @Rule(Fact(disease="عفن الجذور"))
+    @Rule(Fact(disease="عفن الجذور"), salience=5)
     def root_rot_treatment(self):
         print("\n📌 المسبب: مرض عفن الجذور في العنب يُسببه الفطر Phytophthora spp.")
         print("\n💡 العلاج (عفن الجذور - العنب):")

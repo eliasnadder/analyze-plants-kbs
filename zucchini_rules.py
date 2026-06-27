@@ -183,7 +183,7 @@ class ZucchiniRules(PlantDiagnosisEngine):
     ,
         salience=10
     )
-    def bacterial_wilt_weak(self, cf1):
+    def zucchini_bacterial_wilt_weak(self, cf1):
         final = round(cf1 * 0.45)
         print(f"\n❗ احتمال ضعيف: مرض الذبول البكتيري (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")

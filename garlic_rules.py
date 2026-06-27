@@ -48,7 +48,7 @@ class GarlicRules(PlantDiagnosisEngine):
     ,
         salience=10
     )
-    def downy_mildew_weak(self, cf1):
+    def garlic_downy_mildew_weak(self, cf1):
         final = round(cf1 * 0.45)
         print(f"\n❗ احتمال ضعيف: مرض البياض الزغبي (Peronospora destructor) (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")

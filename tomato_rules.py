@@ -9,6 +9,8 @@ class TomatoRules(PlantDiagnosisEngine):
         Symptom(name='هالات صفراء حول البقع', cf=MATCH.cf2),
         Symptom(name='ذبول الأوراق السفلية', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def early_blight_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -27,6 +29,8 @@ class TomatoRules(PlantDiagnosisEngine):
                 Symptom(name='ذبول الأوراق السفلية', cf=MATCH.cf2),
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
         )
+    ,
+        salience=20
     )
     def early_blight_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
@@ -41,16 +45,15 @@ class TomatoRules(PlantDiagnosisEngine):
             Symptom(name='ذبول الأوراق السفلية', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60),
-        salience=5,
+        salience=10,
     )
     def early_blight_weak(self, cf1):
         final = round(cf1 * 0.45)
         print(f"\n❗ احتمال ضعيف: اللفحة المبكرة (الطماطم) (درجة الثقة: {final}/100)")
         print("⚠️ يُنصح بإدخال المزيد من الأعراض لتأكيد التشخيص بسبب التشابه مع أعراض مرض آخر")
         self.declare(Fact(disease="اللفحة المبكرة"))
-        self.halt()
 
-    @Rule(Fact(disease="اللفحة المبكرة"))
+    @Rule(Fact(disease="اللفحة المبكرة"), salience=5)
     def early_blight_treatment(self):
         print("\n📌 المسبب: مرض اللفحة المبكرة في الطماطم يُسببه الفطر Alternaria solani.")
         print("\n💡 العلاج (اللفحة المبكرة - الطماطم):")
@@ -68,6 +71,8 @@ class TomatoRules(PlantDiagnosisEngine):
         Symptom(name='تعفن بني على السيقان أو الثمار', cf=MATCH.cf2),
         Symptom(name='ظهور زغب رمادي أو أبيض تحت الأوراق', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def late_blight_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -86,6 +91,8 @@ class TomatoRules(PlantDiagnosisEngine):
                 Symptom(name='ظهور زغب رمادي أو أبيض تحت الأوراق', cf=MATCH.cf2),
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
         )
+    ,
+        salience=20
     )
     def late_blight_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
@@ -107,9 +114,8 @@ class TomatoRules(PlantDiagnosisEngine):
         print(f"\n❗ احتمال ضعيف: اللفحة المتأخرة (الطماطم) (درجة الثقة: {final}/100)")
         print("⚠️ يُنصح بإدخال المزيد من الأعراض لتأكيد التشخيص بسبب التشابه مع أعراض مرض آخر.")
         self.declare(Fact(disease="اللفحة المتأخرة"))
-        self.halt()
 
-    @Rule(Fact(disease="اللفحة المتأخرة"))
+    @Rule(Fact(disease="اللفحة المتأخرة"), salience=5)
     def late_blight_treatment(self):
         print("\n📌 المسبب: مرض اللفحة المتأخرة في الطماطم يُسببه الفطر Phytophthora infestans.")
         print("\n💡 العلاج (اللفحة المتأخرة - الطماطم):")
@@ -126,6 +132,8 @@ class TomatoRules(PlantDiagnosisEngine):
         Symptom(name='لا يظهر تعفن على الساق', cf=MATCH.cf2),
         Symptom(name='إفرازات مخاطية من قاعدة الساق', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def bacterial_wilt_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -144,6 +152,8 @@ class TomatoRules(PlantDiagnosisEngine):
                 Symptom(name='إفرازات مخاطية من قاعدة الساق', cf=MATCH.cf2),
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
         )
+    ,
+        salience=20
     )
     def bacterial_wilt_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
@@ -158,6 +168,8 @@ class TomatoRules(PlantDiagnosisEngine):
             Symptom(name='إفرازات مخاطية من قاعدة الساق', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def bacterial_wilt_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -165,7 +177,7 @@ class TomatoRules(PlantDiagnosisEngine):
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين دقة التشخيص.")
         self.declare(Fact(disease="الذبول البكتيري"))
 
-    @Rule(Fact(disease="الذبول البكتيري"))
+    @Rule(Fact(disease="الذبول البكتيري"), salience=5)
     def bacterial_wilt_treatment(self):
         print("\n📌 المسبب: مرض الذبول البكتيري في الطماطم يُسببه البكتيريا Ralstonia solanacearum.")
         print("\n💡 العلاج (الذبول البكتيري - الطماطم):")
@@ -183,6 +195,8 @@ class TomatoRules(PlantDiagnosisEngine):
         Symptom(name='تشقق الجلد على الثمار', cf=MATCH.cf2),
         Symptom(name='تساقط الأوراق', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def bacterial_spot_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -201,6 +215,8 @@ class TomatoRules(PlantDiagnosisEngine):
                 Symptom(name='تساقط الأوراق', cf=MATCH.cf2),
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
         )
+    ,
+        salience=20
     )
     def bacterial_spot_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
@@ -215,6 +231,8 @@ class TomatoRules(PlantDiagnosisEngine):
             Symptom(name='تساقط الأوراق', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def bacterial_spot_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -222,7 +240,7 @@ class TomatoRules(PlantDiagnosisEngine):
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
         self.declare(Fact(disease="تبقع الأوراق البكتيري"))
 
-    @Rule(Fact(disease="تبقع الأوراق البكتيري"))
+    @Rule(Fact(disease="تبقع الأوراق البكتيري"), salience=5)
     def bacterial_spot_treatment(self):
         print("\n📌 المسبب: مرض تبقّع الأوراق البكتيري في الطماطم يُسببه البكتيريا Xanthomonas vesicatoria.")
         print("\n💡 العلاج (تبقع الأوراق البكتيري - الطماطم):")
@@ -238,6 +256,8 @@ class TomatoRules(PlantDiagnosisEngine):
         Symptom(name='بقعة سوداء غائرة في أسفل الثمرة', cf=MATCH.cf1),
         Symptom(name='تصبح قاسية وجافة', cf=MATCH.cf2),
         TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=30
     )
     def blossom_end_rot_full(self, cf1, cf2):
         final = round(min(cf1, cf2) * 0.85)
@@ -251,6 +271,8 @@ class TomatoRules(PlantDiagnosisEngine):
             Symptom(name='تصبح قاسية وجافة', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def blossom_end_rot_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -258,7 +280,7 @@ class TomatoRules(PlantDiagnosisEngine):
         print("⚠️ يُفضل إدخال العرض الثاني لتأكيد التشخيص.")
         self.declare(Fact(disease="عفن الطرف الزهري"))
 
-    @Rule(Fact(disease="عفن الطرف الزهري"))
+    @Rule(Fact(disease="عفن الطرف الزهري"), salience=5)
     def blossom_end_rot_treatment(self):
         print("\n📌 المسبب: مرض عفن الطرف الزهري في الطماطم يُسببه الفطر Botrytis cinerea.")
         print("\n💡 العلاج (عفن الطرف الزهري - الطماطم):")
@@ -277,6 +299,8 @@ class TomatoRules(PlantDiagnosisEngine):
         Symptom(name='تشوه شكل الأوراق', cf=MATCH.cf2),
         Symptom(name='صغر حجم الثمار', cf=MATCH.cf3),
         TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
     )
     def tomato_mosaic_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
@@ -295,6 +319,8 @@ class TomatoRules(PlantDiagnosisEngine):
                 Symptom(name='صغر حجم الثمار', cf=MATCH.cf2),
                 TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
         )
+    ,
+        salience=20
     )
     def tomato_mosaic_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
@@ -309,6 +335,8 @@ class TomatoRules(PlantDiagnosisEngine):
             Symptom(name='صغر حجم الثمار', cf=MATCH.cf1)
         ),
         TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
     )
     def tomato_mosaic_weak(self, cf1):
         final = round(cf1 * 0.45)
@@ -316,7 +344,7 @@ class TomatoRules(PlantDiagnosisEngine):
         print("⚠️ يُنصح بإدخال عرضين أو أكثر لتأكيد التشخيص.")
         self.declare(Fact(disease="موزاييك الطماطم"))
 
-    @Rule(Fact(disease="موزاييك الطماطم"))
+    @Rule(Fact(disease="موزاييك الطماطم"), salience=5)
     def tomato_mosaic_treatment(self):
         print("\n📌 المسبب: فيروس موزاييك الطماطم (Tomato Mosaic Virus) - ToMV")
         print("\n💡 العلاج (موزاييك الطماطم - ToMV):")

@@ -12,7 +12,7 @@ class PotatoRules(PlantDiagnosisEngine):
     ,
         salience=30
     )
-    def late_blight_full(self, cf1, cf2, cf3):
+    def potato_late_blight_full(self, cf1, cf2, cf3):
         final = round(min(cf1, cf2, cf3) * 0.85)
         print(f"\n✅ التشخيص: اللفحة المتأخرة (درجة الثقة: {final}/100)")
         self.declare(Fact(disease="اللفحة المتأخرة"))
@@ -26,7 +26,7 @@ class PotatoRules(PlantDiagnosisEngine):
     ,
         salience=20
     )
-    def late_blight_partial(self, cf1=0, cf2=0):
+    def potato_late_blight_partial(self, cf1=0, cf2=0):
         final = round(min(cf1, cf2) * 0.65)
         print(f"\n⚠️ تشخيص مبدئي: اللفحة المتأخرة (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
@@ -42,7 +42,7 @@ class PotatoRules(PlantDiagnosisEngine):
     ,
         salience=10
     )
-    def late_blight_weak(self, cf1):
+    def potato_late_blight_weak(self, cf1):
         final = round(cf1 * 0.45)
         print(f"\n❗ احتمال ضعيف: اللفحة المتأخرة (درجة الثقة: {final}/100)")
         print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
