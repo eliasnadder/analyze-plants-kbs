@@ -1,0 +1,3180 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+apple_rules.py
+cherry_rules.py
+citrus_rules.py
+core.py
+eggplant_rules.py
+garlic_rules.py
+grape_rules.py
+main.py
+onion_rules.py
+Potato_rules.py
+tomato_rules.py
+zucchini_rules.py
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="apple_rules.py">
+from experta import Rule, Fact, MATCH, TEST, OR, AND
+from core import Symptom, PlantDiagnosisEngine
+
+class AppleRules(PlantDiagnosisEngine):
+
+    # ---------------- جرب التفاح ----------------
+    @Rule(
+        Symptom(name='بقع زيتية على الأوراق', cf=MATCH.cf1),
+        Symptom(name='تشوه الثمار', cf=MATCH.cf2),
+        Symptom(name='تقشر لون الأوراق', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def diagnose_apple_scab_full(self, cf1, cf2, cf3):
+        final_cf = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: جرب التفاح (درجة الثقة: {final_cf}/100)")
+        self.declare(Fact(disease="جرب التفاح"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع زيتية على الأوراق', cf=MATCH.cf1),
+                Symptom(name='تشوه الثمار', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+
+            AND(Symptom(name='بقع زيتية على الأوراق', cf=MATCH.cf1),
+                Symptom(name='تقشر لون الأوراق', cf=MATCH.cf3),
+                TEST(lambda cf1, cf3: min(cf1, cf3) >= 60)),
+
+            AND(Symptom(name='تشوه الثمار', cf=MATCH.cf2),
+                Symptom(name='تقشر لون الأوراق', cf=MATCH.cf3),
+                TEST(lambda cf2, cf3: min(cf2, cf3) >= 60))
+        )
+    ,
+        salience=20
+    )
+    def diagnose_apple_scab_partial(self, cf1=0, cf2=0, cf3=0):
+        final_cf = round(min(v for v in [cf1, cf2, cf3] if v > 0) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: جرب التفاح (درجة الثقة: {final_cf}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="جرب التفاح"))
+
+    @Rule(
+        OR(
+            Symptom(name='بقع زيتية على الأوراق', cf=MATCH.cf1),
+            Symptom(name='تشوه الثمار', cf=MATCH.cf1),
+            Symptom(name='تقشر لون الأوراق', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def diagnose_apple_scab_weak(self, cf1):
+        final_cf = round(cf1 * 0.45)
+        print(f"\n❕ احتمال ضعيف: جرب التفاح (درجة الثقة: {final_cf}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="جرب التفاح"))
+
+    @Rule(Fact(disease='جرب التفاح'), salience=5)
+    def treatment_apple_scab(self):
+        print("\n📌 المسبب: مرض جرب التفاح يُسببه الفطر Venturia inaequalis.")
+        print("\n💡 العلاج (جرب التفاح):")
+        print("- رش Captan أو Kumulus كل 7–14 يوم لمدة 2–3 شهور")
+        print("- رش علاجي بعد الأعراض خلال 48 ساعة")
+        print("- إزالة الأوراق/الثمار المصابة باستمرار")
+        print("- تقليم الأغصان سنويًا")
+        self.halt()
+
+        # ______ العفن الأسود _______
+
+    @Rule(
+        Symptom(name='بقع بنفسجية على الأوراق', cf=MATCH.cf1),
+        Symptom(name='تقرحات على الأغصان', cf=MATCH.cf2),
+        Symptom(name='تعفن بني على الثمار', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def br_full(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) *  0.85)
+        print(f"\n✅ تشخيص : العفن الأسود (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="العفن الأسود"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع بنفسجية على الأوراق', cf=MATCH.cf1),
+                Symptom(name='تقرحات على الأغصان', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='بقع بنفسجية على الأوراق', cf=MATCH.cf1),
+                Symptom(name='تعفن بني على الثمار', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='تقرحات على الأغصان', cf=MATCH.cf1),
+                Symptom(name='تعفن بني على الثمار', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
+        )
+    ,
+        salience=20
+    )
+    def br_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: العفن الأسود (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="العفن الأسود"))
+
+    @Rule(
+        OR(
+            Symptom(name='بقع بنفسجية على الأوراق', cf=MATCH.cf1),
+            Symptom(name='تقرحات على الأغصان', cf=MATCH.cf1),
+            Symptom(name='تعفن بني على الثمار', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def br_weak(self, cf1):
+        final = round(cf1 * 0.45 )
+        print(f"\n❗ احتمال ضعيف: العفن الأسود (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="العفن الأسود"))
+
+    # --- العلاج ---
+    @Rule(Fact(disease="العفن الأسود"), salience=5)
+    def br_treatment(self):
+        print("\n📌 المسبب: مرض العفن الأسود في التفاح يُسببه الفطر Botryosphaeria obtusa.")
+        print("\n💡 العلاج (العفن الأسود):")
+        print("- تقليم وإزالة الثمار/الأغصان المصابة طوال السنة")
+        print("- رش Captan أو Polyram كل 10‑14 يوم لمدة 4–6 أسابيع")
+        print("- بديل بيولوجي: Trianum Shield حسب الحاجة")
+        print("- تقليم Cankers 15 سم تحت الأنسجة المريضة")
+        self.halt()
+
+
+    # ---------------- صدأ التفاح الصنوبري ----------------
+    @Rule(
+        Symptom(name='بقع صفراء على الأوراق', cf=MATCH.cf1),
+        Symptom(name='أورام برتقالية', cf=MATCH.cf2),
+        Symptom(name='تورم الأوراق من الأسفل', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def cedar_rust_full(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) *  0.85)
+        print(f"\n✅ تشخيص : صدأ التفاح الصنوبري (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="صدأ التفاح الصنوبري"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع صفراء على الأوراق', cf=MATCH.cf1),
+                Symptom(name='أورام برتقالية', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='بقع صفراء على الأوراق', cf=MATCH.cf1),
+                Symptom(name='تورم الأوراق من الأسفل', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='أورام برتقالية', cf=MATCH.cf1),
+                Symptom(name='تورم الأوراق من الأسفل', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
+        )
+    ,
+        salience=20
+    )
+    def cedar_rust_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: صدأ التفاح الصنوبري (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="صدأ التفاح الصنوبري"))
+
+    @Rule(
+        OR(
+            Symptom(name='بقع صفراء على الأوراق', cf=MATCH.cf1),
+            Symptom(name='أورام برتقالية', cf=MATCH.cf1),
+            Symptom(name='تورم الأوراق من الأسفل', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def cedar_rust_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: صدأ التفاح الصنوبري (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="صدأ التفاح الصنوبري"))
+
+    @Rule(Fact(disease="صدأ التفاح الصنوبري"), salience=5)
+    def cedar_rust_treatment(self):
+        print("\n📌 المسبب: مرض صدأ التفاح يُسببه الفطر Gymnosporangium juniperi-virginianae.")
+        print("\n💡 العلاج (صدأ التفاح الصنوبري):")
+        print("- رش مبيدات فطرية تحتوي على Myclobutanil أو Mancozeb كل 7–10 أيام أثناء الربيع")
+        print("- إزالة أوراق العرعر القريبة إن أمكن (ناقل المرض)")
+        print("- تقليم الأغصان المصابة وتحسين التهوية")
+        print("- زراعة أصناف مقاومة للمرض في المستقبل")
+        self.halt()
+</file>
+
+<file path="cherry_rules.py">
+from experta import Rule, Fact, MATCH, TEST, OR, AND
+from core import Symptom, PlantDiagnosisEngine
+
+class CherryRules(PlantDiagnosisEngine):
+
+    #البياض الدقيقي
+    @Rule(
+        Symptom(name='بقع بيضاء على سطح الأوراق', cf=MATCH.cf1),
+        Symptom(name='تشوه الأوراق', cf=MATCH.cf2),
+        Symptom(name='تبقع وتلف الثمار', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60),
+        salience=30
+    )
+    def full_diagnosis(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: البياض الدقيقي (الكرز) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="البياض الدقيقي"))
+        self.halt()
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع بيضاء على سطح الأوراق', cf=MATCH.cf1),
+                Symptom(name='تشوه الأوراق', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='بقع بيضاء على سطح الأوراق', cf=MATCH.cf1),
+                Symptom(name='تبقع وتلف الثمار', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='تشوه الأوراق', cf=MATCH.cf1),
+                Symptom(name='تبقع وتلف الثمار', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
+        )
+    ,
+        salience=20
+    )
+    def partial_diagnosis(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: البياض الدقيقي (الكرز) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="البياض الدقيقي"))
+        self.halt()
+
+    @Rule(
+        OR(
+            Symptom(name='بقع بيضاء على سطح الأوراق', cf=MATCH.cf1),
+            Symptom(name='تشوه الأوراق', cf=MATCH.cf1),
+            Symptom(name='تبقع وتلف الثمار', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60),
+        salience=10
+    )
+    def weak_diagnosis(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: البياض الدقيقي (الكرز) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="البياض الدقيقي"))
+        self.halt()
+
+    @Rule(Fact(disease="البياض الدقيقي"), salience=5)
+    def treatment(self):
+        print("\n📌 المسبب: مرض البياض الدقيقي في الكرز يُسببه الفطر Podosphaera clandestina.")
+        print("\n💡 العلاج (البياض الدقيقي - الكرز):")
+        print("- رش الكبريت الميكروني أو Triadimefon عند ظهور أولى العلامات")
+        print("- إعادة الرش كل 10–14 يوم عند الحاجة")
+        print("- إزالة الأوراق المصابة لتحسين التهوية")
+        print("- تقليم الفروع لتقليل الرطوبة حول النبات")
+        self.halt()
+
+
+
+    #تبقع الأوراق
+
+    @Rule(
+        Symptom(name='بقع أرجوانية أو حمراء على الأوراق', cf=MATCH.cf1),
+        Symptom(name='ثقوب دائرية في الأوراق', cf=MATCH.cf2),
+        Symptom(name='بقع داكنة على الثمار', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def shot_hole_full(self, cf1, cf2, cf3):
+        final_cf = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: تَبَقُّع الأوراق - الكرز (درجة الثقة: {final_cf}/100)")
+        self.declare(Fact(disease="تَبَقُّع الأوراق"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع أرجوانية أو حمراء على الأوراق', cf=MATCH.cf1),
+                Symptom(name='ثقوب دائرية في الأوراق', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='بقع أرجوانية أو حمراء على الأوراق', cf=MATCH.cf1),
+                Symptom(name='بقع داكنة على الثمار', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='ثقوب دائرية في الأوراق', cf=MATCH.cf1),
+                Symptom(name='بقع داكنة على الثمار', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
+        )
+    ,
+        salience=20
+    )
+    def shot_hole_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: تَبَقُّع الأوراق (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="تَبَقُّع الأوراق"))
+
+    @Rule(
+        OR(
+            Symptom(name='بقع أرجوانية أو حمراء على الأوراق', cf=MATCH.cf1),
+            Symptom(name='ثقوب دائرية في الأوراق', cf=MATCH.cf1),
+            Symptom(name='بقع داكنة على الثمار', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def shot_hole_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: تَبَقُّع الأوراق (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="تَبَقُّع الأوراق"))
+
+    @Rule(Fact(disease="تَبَقُّع الأوراق"), salience=5)
+    def treatment_shot_hole(self):
+        print("\n📌 المسبب: مرض تبقّع الأوراق في الكرز يُسببه الفطر Blumeriella jaapii.")
+        print("\n💡 العلاج (تَبَقُّع الأوراق - الكرز):")
+        print("- رش مبيدات فطرية تحتوي على النحاس أو Captan خلال الخريف والربيع")
+        print("- إزالة الأوراق والثمار المصابة وتقليل الرطوبة")
+        print("- تحسين التهوية من خلال تقليم جيد")
+        self.halt()
+
+
+
+
+    #  عفن الثمار البني
+    @Rule(
+        Symptom(name='بقع بنية طرية على الثمار', cf=MATCH.cf1),
+        Symptom(name='ظهور دوائر بيضاء من الأبواغ', cf=MATCH.cf2),
+        Symptom(name='تعفن الثمار وتساقطها', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def cherry_brown_rot_full(self, cf1, cf2, cf3):
+        final_cf = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: عفن الثمار البني (الكرز) (درجة الثقة: {final_cf}/100)")
+        self.declare(Fact(disease="عفن الثمار البني"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع بنية طرية على الثمار', cf=MATCH.cf1),
+                Symptom(name='ظهور دوائر بيضاء من الأبواغ', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='بقع بنية طرية على الثمار', cf=MATCH.cf1),
+                Symptom(name='تعفن الثمار وتساقطها', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='ظهور دوائر بيضاء من الأبواغ', cf=MATCH.cf1),
+                Symptom(name='تعفن الثمار وتساقطها', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
+        )
+    ,
+        salience=20
+    )
+    def cherry_brown_rot_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: عفن الثمار البني (الكرز) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="عفن الثمار البني"))
+
+    @Rule(
+        OR(
+            Symptom(name='بقع بنية طرية على الثمار', cf=MATCH.cf1),
+            Symptom(name='ظهور دوائر بيضاء من الأبواغ', cf=MATCH.cf1),
+            Symptom(name='تعفن الثمار وتساقطها', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def cherry_brown_rot_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: عفن الثمار البني (الكرز) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="عفن الثمار البني"))
+
+    @Rule(Fact(disease="عفن الثمار البني"), salience=5)
+    def cherry_brown_rot_treatment(self):
+        print("\n📌 المسبب: مرض عفن القمار البني في الكرز يُسببه الفطر Monilinia fructicola.")
+        print("\n💡 العلاج (عفن الثمار البني - الكرز):")
+        print("- إزالة الثمار المصابة وعدم تركها على الشجرة أو في الأرض")
+        print("- الرش بمبيدات فطرية مثل Captan أو Myclobutanil في فترة الإزهار وقبل القطاف")
+        print("- تقليم الفروع المصابة وتحسين التهوية")
+        print("- تقليل الري وقت نضج الثمار لتقليل الرطوبة الزائدة")
+        self.halt()
+
+
+
+
+    #  سرطان اللحاء البكتيري
+    @Rule(
+        Symptom(name='تقرحات غائرة على الساق أو الأغصان', cf=MATCH.cf1),
+        Symptom(name='تسرب صمغ من أماكن التقرحات', cf=MATCH.cf2),
+        Symptom(name='ذبول مفاجئ للأوراق أو الأغصان', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def cherry_bacterial_canker_full(self, cf1, cf2, cf3):
+        final_cf = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: سرطان اللحاء البكتيري (الكرز) (درجة الثقة: {final_cf}/100)")
+        self.declare(Fact(disease="سرطان اللحاء البكتيري"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='تقرحات غائرة على الساق أو الأغصان', cf=MATCH.cf1),
+                Symptom(name='تسرب صمغ من أماكن التقرحات', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='تقرحات غائرة على الساق أو الأغصان', cf=MATCH.cf1),
+                Symptom(name='ذبول مفاجئ للأوراق أو الأغصان', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='تسرب صمغ من أماكن التقرحات', cf=MATCH.cf1),
+                Symptom(name='ذبول مفاجئ للأوراق أو الأغصان', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
+        )
+    ,
+        salience=20
+    )
+    def cherry_bacterial_canker_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: سرطان اللحاء البكتيري (الكرز) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="سرطان اللحاء البكتيري"))
+
+    @Rule(
+        OR(
+            Symptom(name='تقرحات غائرة على الساق أو الأغصان', cf=MATCH.cf1),
+            Symptom(name='تسرب صمغ من أماكن التقرحات', cf=MATCH.cf1),
+            Symptom(name='ذبول مفاجئ للأوراق أو الأغصان', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def cherry_bacterial_canker_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: سرطان اللحاء البكتيري (الكرز) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="سرطان اللحاء البكتيري"))
+
+    @Rule(Fact(disease="سرطان اللحاء البكتيري"), salience=5)
+    def cherry_bacterial_canker_treatment(self):
+        print("\n📌 المسبب: مرض سرطان اللحاء البكتيري في الكرز يُسببه البكتيريا Pseudomonas syringae pv. syringae.")
+        print("\n💡 العلاج (سرطان اللحاء البكتيري - الكرز):")
+        print("- تقليم الأغصان المصابة في الصيف فقط (لتقليل انتشار البكتيريا)")
+        print("- رش مضادات بكتيرية مثل أوكسي كلوريد النحاس بعد التقليم")
+        print("- تطهير أدوات التقليم بمحلول كحولي أو مبيض مخفف")
+        print("- زراعة أصناف مقاومة والابتعاد عن الزراعة في الأراضي المجهدة")
+        self.halt()
+</file>
+
+<file path="citrus_rules.py">
+from experta import Rule, Fact, MATCH, TEST, OR, AND
+from core import Symptom, PlantDiagnosisEngine
+
+class CitrusRules(PlantDiagnosisEngine):
+
+    #   مرض مالسيكو
+    @Rule(
+        Symptom(name='اصفرار وتمدد للأوراق والشعيرات الخشبية', cf=MATCH.cf1),
+        Symptom(name='ذبول وفناء أجزاء من الفروع', cf=MATCH.cf2),
+        Symptom(name='إفرازات صمغية وردية أو رمادية في الجذوع', cf=MATCH.cf3),
+        Symptom(name='بقع داكنة أو تكاثف للنسيج الخشبي تحت اللحاء', cf=MATCH.cf4),
+        TEST(lambda cf1, cf2, cf3, cf4: min(cf1, cf2, cf3, cf4) >= 60)
+    )
+    def mal_secco_full_4(self, cf1, cf2, cf3, cf4):
+        final = round(min(cf1, cf2, cf3, cf4) * 0.9)
+        print(f"\n✅ التشخيص: مرض مالسيكو (الحمضيات) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="مالسيكو"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='اصفرار وتمدد للأوراق والشعيرات الخشبية', cf=MATCH.cf1),
+                Symptom(name='ذبول وفناء أجزاء من الفروع', cf=MATCH.cf2),
+                Symptom(name='إفرازات صمغية وردية أو رمادية في الجذوع', cf=MATCH.cf3)),
+            AND(Symptom(name='ذبول وفناء أجزاء من الفروع', cf=MATCH.cf1),
+                Symptom(name='إفرازات صمغية وردية أو رمادية في الجذوع', cf=MATCH.cf2),
+                Symptom(name='بقع داكنة أو تكاثف للنسيج الخشبي تحت اللحاء', cf=MATCH.cf3)),
+            AND(Symptom(name='اصفرار وتمدد للأوراق والشعيرات الخشبية', cf=MATCH.cf1),
+                Symptom(name='إفرازات صمغية وردية أو رمادية في الجذوع', cf=MATCH.cf2),
+                Symptom(name='بقع داكنة أو تكاثف للنسيج الخشبي تحت اللحاء', cf=MATCH.cf3)),
+            AND(Symptom(name='اصفرار وتمدد للأوراق والشعيرات الخشبية', cf=MATCH.cf1),
+                Symptom(name='ذبول وفناء أجزاء من الفروع', cf=MATCH.cf2),
+                Symptom(name='بقع داكنة أو تكاثف للنسيج الخشبي تحت اللحاء', cf=MATCH.cf3))
+        ),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def mal_secco_partial_strong(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.8)
+        print(f"\n⚠️ تشخيص مؤكد جزئيًا: مرض مالسيكو (الحمضيات) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="مالسيكو"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='اصفرار وتمدد للأوراق والشعيرات الخشبية', cf=MATCH.cf1),
+                Symptom(name='ذبول وفناء أجزاء من الفروع', cf=MATCH.cf2)),
+            AND(Symptom(name='إفرازات صمغية وردية أو رمادية في الجذوع', cf=MATCH.cf1),
+                Symptom(name='بقع داكنة أو تكاثف للنسيج الخشبي تحت اللحاء', cf=MATCH.cf2)),
+            AND(Symptom(name='اصفرار وتمدد للأوراق والشعيرات الخشبية', cf=MATCH.cf1),
+                Symptom(name='بقع داكنة أو تكاثف للنسيج الخشبي تحت اللحاء', cf=MATCH.cf2)),
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    )
+    def mal_secco_partial_basic(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.6)
+        print(f"\n⚠️ تشخيص مبدئي: مرض مالسيكو (الحمضيات) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="مالسيكو"))
+
+    @Rule(
+        OR(
+            Symptom(name='اصفرار وتمدد للأوراق والشعيرات الخشبية', cf=MATCH.cf1),
+            Symptom(name='ذبول وفناء أجزاء من الفروع', cf=MATCH.cf1),
+            Symptom(name='إفرازات صمغية وردية أو رمادية في الجذوع', cf=MATCH.cf1),
+            Symptom(name='بقع داكنة أو تكاثف للنسيج الخشبي تحت اللحاء', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    )
+    def mal_secco_weak(self, cf1):
+        final = round(cf1 * 0.5)
+        print(f"\n❗ احتمال ضعيف: مرض مالسيكو (الحمضيات) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="مالسيكو"))
+
+    @Rule(Fact(disease="مالسيكو"))
+    def mal_secco_treatment(self):
+        print("\n📌 المسبب: مرض مالسيكو في الحمضيات يُسببه الفطر Plenodomus tracheiphilus.")
+        print("\n💡 العلاج (مرض مالسيكو - الحمضيات):")
+        print("- تقليم الأفرع المصابة فورًا والتخلص منها بالحرق.")
+        print("- تطهير أدوات التقليم لمنع الانتشار.")
+        print("- رش مبيد فطري نحاسي بعد التقليم.")
+        print("- زراعة أصناف مقاومة وتحسين صرف التربة.")
+        self.halt()
+
+
+
+    #عفن الجذور
+
+    @Rule(
+        Symptom(name='إفرازات صمغية سوداء أو بنية عند قاعدة الجذع', cf=MATCH.cf1),
+        Symptom(name='تقرحات أو تصدعات في اللحاء بالقرب من سطح التربة', cf=MATCH.cf2),
+        Symptom(name='ذبول الأصناف وضعف نمو الأوراق', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def gummosis_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض عفن الجذور / الصمغ (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="عفن الجذور والصمغ"))
+
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='إفرازات صمغية سوداء أو بنية عند قاعدة الجذع', cf=MATCH.cf1),
+                Symptom(name='تقرحات أو تصدعات في اللحاء بالقرب من سطح التربة', cf=MATCH.cf2)),
+            AND(Symptom(name='إفرازات صمغية سوداء أو بنية عند قاعدة الجذع', cf=MATCH.cf1),
+                Symptom(name='ذبول الأصناف وضعف نمو الأورقات', cf=MATCH.cf2)),
+            AND(Symptom(name='تقرحات أو تصدعات في اللحاء بالقرب من سطح التربة', cf=MATCH.cf1),
+                Symptom(name='ذبول الأصناف وضعف نمو الأورقات', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    )
+    def gummosis_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي : مرض عفن الجذور / الصمغ (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="عفن الجذور والصمغ"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='إفرازات صمغية سوداء أو بنية عند قاعدة الجذع', cf=MATCH.cf1),
+            Symptom(name='تقرحات أو تصدعات في اللحاء بالقرب من سطح التربة', cf=MATCH.cf1),
+            Symptom(name='ذبول الأصناف وضعف نمو الأورقات', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    )
+    def gummosis_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض عفن الجذور / الصمغ (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="عفن الجذور والصمغ"))
+
+    @Rule(Fact(disease="عفن الجذور والصمغ"))
+    def gummosis_treatment(self):
+        print("\n📌 المسبب: مرض عفن الجذور في الحمضيات يُسببه الفطر Phytophthora spp.")
+        print("\n💡 العلاج (مرض عفن الجذور / الصمغ - الحمضيات):")
+        print("- تحسين تصريف التربة وتقليل الري.")
+        print("- رش أو تطهير الجذوع بمبيدات فطرية مضادة لـ Phytophthora (مثل فوندازول).")
+        print("- معالجة التربة بمبيد فطري عند الزراعة.")
+        print("- زراعة أشجار على تلال مرتفعة لتقليل تجمع المياه.")
+        print("- التخلص من الأشجار الشديدة الإصابة.")
+        self.halt()
+
+
+    #فيروس ترايستيزا
+    @Rule(
+        Symptom(name='اختناق النسيج الوعائي وموت الفروع', cf=MATCH.cf1),
+        Symptom(name='تجعد أو تساقط الأوراق', cf=MATCH.cf2),
+        Symptom(name='ضعف في النمو، وقلة الإنتاجية', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def tristeza_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض ترايستيزا الفيروسي (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="ترايستيزا"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='اختناق النسيج الوعائي وموت الفروع', cf=MATCH.cf1),
+                Symptom(name='تجعد أو تساقط الأوراق', cf=MATCH.cf2)),
+            AND(Symptom(name='اختناق النسيج الوعائي وموت الفروع', cf=MATCH.cf1),
+                Symptom(name='ضعف في النمو، وقلة الإنتاجية', cf=MATCH.cf2)),
+            AND(Symptom(name='تجعد أو تساقط الأوراق', cf=MATCH.cf1),
+                Symptom(name='ضعف في النمو، وقلة الإنتاجية', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    )
+    def tristeza_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض ترايستيزا الفيروسي (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="ترايستيزا"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='اختناق النسيج الوعائي وموت الفروع', cf=MATCH.cf1),
+            Symptom(name='تجعد أو تساقط الأوراق', cf=MATCH.cf1),
+            Symptom(name='ضعف في النمو، وقلة الإنتاجية', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60),
+        salience= 10,
+    )
+    def tristeza_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض ترايستيزا الفيروسي (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر ")
+        self.declare(Fact(disease="ترايستيزا"))
+        self.halt()
+
+    @Rule(Fact(disease="ترايستيزا"))
+    def tristeza_treatment(self):
+        print("\n📌 المسبب: فيروس ترايستيزا (Citrus Tristeza Virus) - CTV")
+        print("\n💡 العلاج (مرض ترايستيزا الفيروسي - الحمضيات):")
+        print("- زراعة أصناف مقاومة للفيروس.")
+        print("- مكافحة حشرات المن ناقل الفيروس باستخدام مبيدات حشرية.")
+        print("- إزالة الأشجار المصابة فورًا ومنع انتشارها.")
+        print("- استخدام تطعيمات خالية من الفيروس عند الزراعة الجديدة.")
+        print("- تعقيم أدوات العمل بين الأشجار.")
+        self.halt()
+
+
+    #التبقع الأسود
+    @Rule(
+        Symptom(name='بقع داكنة غائرة على الثمار', cf=MATCH.cf1),
+        Symptom(name='تساقط مبكر للثمار', cf=MATCH.cf2),
+        Symptom(name='بقع صغيرة على الأوراق في بعض الحالات', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def black_spot_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض التبقّع الأسود (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="التبقّع الأسود"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع داكنة غائرة على الثمار', cf=MATCH.cf1),
+                Symptom(name='تساقط مبكر للثمار', cf=MATCH.cf2)),
+            AND(Symptom(name='بقع داكنة غائرة على الثمار', cf=MATCH.cf1),
+                Symptom(name='بقع صغيرة على الأوراق في بعض الحالات', cf=MATCH.cf2)),
+            AND(Symptom(name='تساقط مبكر للثمار', cf=MATCH.cf1),
+                Symptom(name='بقع صغيرة على الأوراق في بعض الحالات', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    )
+    def black_spot_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: مرض التبقّع الأسود (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="التبقّع الأسود"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='بقع داكنة غائرة على الثمار', cf=MATCH.cf1),
+            Symptom(name='تساقط مبكر للثمار', cf=MATCH.cf1),
+            Symptom(name='بقع صغيرة على الأوراق في بعض الحالات', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    )
+    def black_spot_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض التبقّع الأسود (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="التبقّع الأسود"))
+
+
+
+    @Rule(Fact(disease="التبقّع الأسود"))
+    def black_spot_treatment(self):
+        print("\n📌 المسبب: مرض التبقّع الأسود في الحمضيات يُسببه البكتيريا Xanthomonas citri subsp. citri.")
+        print("\n💡 العلاج (مرض التبقّع الأسود - الحمضيات):")
+        print("- رش الأشجار بمبيدات فطرية تحتوي على النحاس (مثل بوردو ميكس).")
+        print("- تقليم الأفرع المصابة وإزالة الثمار الساقطة والتالفة.")
+        print("- تحسين التهوية بين الأشجار وتقليل الرطوبة.")
+        print("- مراقبة البؤر المرضية والحد من انتشارها.")
+        print("- زراعة أصناف مقاومة إن أمكن.")
+        self.halt()
+
+
+    #الحصف البكتيري
+    @Rule(
+        Symptom(name='تقرحات مائية على الأوراق والسيقان والثمار', cf=MATCH.cf1),
+        Symptom(name='يحيط بها هالة صفراء', cf=MATCH.cf2),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    )
+    def bacterial_canker_full(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.7)
+        print(f"\n✅ التشخيص: مرض الحصف البكتيري (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="الحصف البكتيري"))
+
+
+
+    @Rule(
+        OR(
+            Symptom(name='تقرحات مائية على الأوراق والسيقان والثمار', cf=MATCH.cf1),
+            Symptom(name='يحيط بها هالة صفراء', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    )
+    def bacterial_canker_weak(self, cf1):
+        final = round(cf1 * 0.4)
+        print(f"\n❗ احتمال ضعيف: مرض الحصف البكتيري (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="الحصف البكتيري"))
+
+
+    @Rule(Fact(disease="الحصف البكتيري"))
+    def bacterial_canker_treatment(self):
+        print("\n📌 المسبب: مرض الحصف البكتيري في الحمضيات يُسببه البكتيريا Xanthomonas citri subsp. citri.")
+        print("\n💡 العلاج (مرض الحصف البكتيري - الحمضيات):")
+        print("- إزالة وتدمير الأجزاء المصابة بالمرض (حرق أو دفن عميق).")
+        print("- رش الأشجار بمحلول نحاسي (مثل أوكسي كلوريد النحاس أو بوردو ميكس).")
+        print("- تقليم الأشجار لتحسين التهوية وتقليل الرطوبة.")
+        print("- منع انتقال البكتيريا عبر المياه أو أدوات التقليم دون تعقيم.")
+        print("- زراعة أصناف مقاومة للمرض إن أمكن.")
+        self.halt()
+
+
+
+
+    #البقعة الدهنية
+    @Rule(
+        Symptom(name='بقع صفراء-بنية لامعة على السطح السفلي للأوراق', cf=MATCH.cf1),
+        Symptom(name='تجعد أو تساقط الأوراق', cf=MATCH.cf2),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    )
+    def greasy_spot_full(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.7)
+        print(f"\n✅ التشخيص: مرض البقعة الدهنية (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="البقعة الدهنية"))
+
+    @Rule(
+        OR(
+            Symptom(name='بقع صفراء-بنية لامعة على السطح السفلي للأوراق', cf=MATCH.cf1),
+            Symptom(name='تجعد أو تساقط الأوراق', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60),
+        salience= 5 ,
+    )
+    def greasy_spot_weak(self, cf1):
+        final = round(cf1 * 0.4)
+        print(f"\n❗ احتمال ضعيف: مرض البقعة الدهنية (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
+        self.declare(Fact(disease="البقعة الدهنية"))
+        self.halt(),
+
+    @Rule(Fact(disease="البقعة الدهنية"))
+    def greasy_spot_treatment(self):
+        print("\n📌 المسبب: مرض البقعة الدهنية في الحمضيات يُسببه الفطر Alternaria citri أو Alternaria alternata.")
+        print("\n💡 العلاج (مرض البقعة الدهنية - الحمضيات):")
+        print("- رش الأشجار بمبيد فطري نحاسي أو مبيد يحتوي على الكبريت.")
+        print("- تقليم الأوراق المصابة وإزالة بقايا الأوراق الساقطة من حول الشجرة.")
+        print("- تحسين التهوية بين الأشجار وتقليل الرطوبة.")
+        print("- تكرار الرش الوقائي خاصة في فترات الرطوبة العالية.")
+        self.halt()
+</file>
+
+<file path="core.py">
+from experta import Fact, KnowledgeEngine
+
+class Symptom(Fact):
+    """عرض + درجة ثقة"""
+    pass
+
+class PlantDiagnosisEngine(KnowledgeEngine):
+    pass
+</file>
+
+<file path="eggplant_rules.py">
+from experta import Rule, Fact, MATCH, TEST, OR, AND
+from core import Symptom, PlantDiagnosisEngine
+
+class EggplantRules(PlantDiagnosisEngine):
+
+    #الذبول البكتيري
+    @Rule(
+        Symptom(name='ذبول مفاجئ للنبات بدون اصفرار سابق', cf=MATCH.cf1),
+        Symptom(name='تحول الساق الداخلي إلى اللون البني – يظهر عند قطع الجذع انسياب سائل مخاطي', cf=MATCH.cf2),
+        Symptom(name='موت النبات بالكامل، خصوصًا في الطقس الدافئ والرطب', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def bacterial_wilt_eggplant_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض الذبول البكتيري (الباذنجان) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="الذبول البكتيري"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='ذبول مفاجئ للنبات بدون اصفرار سابق', cf=MATCH.cf1),
+                Symptom(name='تحول الساق الداخلي إلى اللون البني – يظهر عند قطع الجذع انسياب سائل مخاطي',
+                        cf=MATCH.cf2)),
+            AND(Symptom(name='ذبول مفاجئ للنبات بدون اصفرار سابق', cf=MATCH.cf1),
+                Symptom(name='موت النبات بالكامل، خصوصًا في الطقس الدافئ والرطب', cf=MATCH.cf2)),
+            AND(Symptom(name='تحول الساق الداخلي إلى اللون البني – يظهر عند قطع الجذع انسياب سائل مخاطي', cf=MATCH.cf1),
+                Symptom(name='موت النبات بالكامل، خصوصًا في الطقس الدافئ والرطب', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    )
+    def bacterial_wilt_eggplant_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض الذبول البكتيري (الباذنجان) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="الذبول البكتيري"))
+
+    #
+
+    @Rule(
+        OR(
+            Symptom(name='ذبول مفاجئ للنبات بدون اصفرار سابق', cf=MATCH.cf1),
+            Symptom(name='تحول الساق الداخلي إلى اللون البني – يظهر عند قطع الجذع انسياب سائل مخاطي', cf=MATCH.cf1),
+            Symptom(name='موت النبات بالكامل، خصوصًا في الطقس الدافئ والرطب', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    )
+    def bacterial_wilt_eggplant_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض الذبول البكتيري (الباذنجان) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="الذبول البكتيري"))
+
+
+    @Rule(Fact(disease="الذبول البكتيري"))
+    def bacterial_wilt_eggplant_treatment(self):
+        print("\n📌 المسبب: مرض الذبول البكتيري في الباذنجان يُسببه البكتيريا Ralstonia solanacearum.")
+        print("\n💡 العلاج (مرض الذبول البكتيري - الباذنجان):")
+        print("- إزالة النباتات المصابة فورًا والتخلص منها (لا تُعاد كسماد).")
+        print("- تجنب زراعة الباذنجان أو البطاطا في نفس التربة المصابة لمدة 2-3 سنوات.")
+        print("- تعقيم أدوات العمل بين النباتات.")
+        print("- تحسين تصريف التربة وتقليل الرطوبة حول الجذور.")
+        print("- لا يوجد علاج فعّال، لذا يُركز على الوقاية فقط.")
+        self.halt()
+
+
+    #الذبول الفيوزاريومي
+
+    @Rule(
+        Symptom(name='اصفرار الأوراق السفلية تدريجيًا، ثم ذبولها', cf=MATCH.cf1),
+        Symptom(name='تظهر بقع بنية على الأوعية الوعائية داخل الساق عند تقطيعها', cf=MATCH.cf2),
+        Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def verticillium_wilt_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض الذبول الفيوزاريومي (الباذنجان) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="الذبول الفيوزاريومي"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='اصفرار الأوراق السفلية تدريجيًا، ثم ذبولها', cf=MATCH.cf1),
+                Symptom(name='تظهر بقع بنية على الأوعية الوعائية داخل الساق عند تقطيعها', cf=MATCH.cf2)),
+            AND(Symptom(name='اصفرار الأوراق السفلية تدريجيًا، ثم ذبولها', cf=MATCH.cf1),
+                Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf2)),
+            AND(Symptom(name='تظهر بقع بنية على الأوعية الوعائية داخل الساق عند تقطيعها', cf=MATCH.cf1),
+                Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    )
+    def verticillium_wilt_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض الذبول الفيوزاريومي (الباذنجان) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="الذبول الفيوزاريومي"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='اصفرار الأوراق السفلية تدريجيًا، ثم ذبولها', cf=MATCH.cf1),
+            Symptom(name='تظهر بقع بنية على الأوعية الوعائية داخل الساق عند تقطيعها', cf=MATCH.cf1),
+            Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60),
+        salience=10
+
+    )
+    def verticillium_wilt_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض الذبول الفيوزاريومي (الباذنجان) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
+        self.declare(Fact(disease="الذبول الفيوزاريومي")),
+        self.halt(),
+
+
+    @Rule(Fact(disease="الذبول الفيوزاريومي"))
+    def verticillium_wilt_treatment(self):
+        print("\n📌 المسبب: مرض الذبول الفيوزاريومي في الباذنجان يُسببه الفطر Fusarium oxysporum f. sp. melongenae.")
+        print("\n💡 العلاج (مرض الذبول الفيوزاريومي - الباذنجان):")
+        print("- زراعة أصناف مقاومة للمرض (معتمدة).")
+        print("- تدوير المحاصيل وعدم زراعة الباذنجان أو البطاطا أو الطماطم في نفس التربة لمدة 3-4 سنوات.")
+        print("- تعقيم التربة بالبخار أو المواد الكيميائية (مثل الميثيل برومايد أو البديل الآمن).")
+        print("- تحسين تصريف التربة وتقليل الري الزائد.")
+        print("- إزالة وإتلاف النباتات المصابة.")
+        self.halt()
+
+
+    #مرض عفن الفاكهة والفيوغثور
+
+    @Rule(
+        Symptom(name='بقع بنية مائية على الثمار، خاصة في النبات السفلي', cf=MATCH.cf1),
+        Symptom(name='تعفن الساقين عند قاعدة النبات، مع ظهور طبقة بيضاء زغبية', cf=MATCH.cf2),
+        Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def phytophthora_blight_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض عفن الفاكهة والفيوغثور (الباذنجان) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="عفن الفاكهة والفيوغثور"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع بنية مائية على الثمار، خاصة في النبات السفلي', cf=MATCH.cf1),
+                Symptom(name='تعفن الساقين عند قاعدة النبات، مع ظهور طبقة بيضاء زغبية', cf=MATCH.cf2)),
+            AND(Symptom(name='بقع بنية مائية على الثمار، خاصة في النبات السفلي', cf=MATCH.cf1),
+                Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf2)),
+            AND(Symptom(name='تعفن الساقين عند قاعدة النبات، مع ظهور طبقة بيضاء زغبية', cf=MATCH.cf1),
+                Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    )
+    def phytophthora_blight_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض عفن الفاكهة والفيوغثور (الباذنجان) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="عفن الفاكهة والفيوغثور"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='بقع بنية مائية على الثمار، خاصة في النبات السفلي', cf=MATCH.cf1),
+            Symptom(name='تعفن الساقين عند قاعدة النبات، مع ظهور طبقة بيضاء زغبية', cf=MATCH.cf1),
+            Symptom(name='ضعف النمو وتراجع إنتاج الثمار', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60),
+        salience=5
+    )
+    def phytophthora_blight_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض عفن الفاكهة والفيوغثور (الباذنجان) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
+        self.declare(Fact(disease="عفن الفاكهة والفيوغثور"))
+        self.halt()
+
+
+    @Rule(Fact(disease="عفن الفاكهة والفيوغثور"))
+    def phytophthora_blight_treatment(self):
+        print("\n📌 المسبب: مرض عفن الفاكهة والفيوغثور في الباذنجان يُسببه الفطر Phytophthora capsici.")
+        print("\n💡 العلاج (مرض عفن الفاكهة والفيوغثور - الباذنجان):")
+        print("- تحسين تصريف التربة وتقليل الري الزائد.")
+        print("- رش النبات بمبيد فطري مضاد للفيوغثور مثل مبيدات تحتوي على مانيتول أو ميتالاكسيل.")
+        print("- إزالة وإتلاف النباتات المصابة فورًا.")
+        print("- تعقيم التربة قبل الزراعة الجديدة.")
+        print("- تجنب الزراعة الكثيفة وتحسين التهوية بين النباتات.")
+        self.halt()
+
+
+
+    #تبقع الأوراق
+
+    @Rule(
+        Symptom(name='بقع دائرية داكنة على الأوراق، غالبًا محاطة بهالة صفراء', cf=MATCH.cf1),
+        Symptom(name='انثقاب البقع وتحولها إلى "ثقوب" عند تقدم الإصابة', cf=MATCH.cf2),
+        Symptom(name='تساقط الأوراق وضعف التمثيل الضوئي', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def cercospora_leaf_spot_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض تبقّع الأوراق (Cercospora) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="تبقّع الأوراق"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع دائرية داكنة على الأوراق، غالبًا محاطة بهالة صفراء', cf=MATCH.cf1),
+                Symptom(name='انثقاب البقع وتحولها إلى "ثقوب" عند تقدم الإصابة', cf=MATCH.cf2)),
+            AND(Symptom(name='بقع دائرية داكنة على الأوراق، غالبًا محاطة بهالة صفراء', cf=MATCH.cf1),
+                Symptom(name='تساقط الأوراق وضعف التمثيل الضوئي', cf=MATCH.cf2)),
+            AND(Symptom(name='انثقاب البقع وتحولها إلى "ثقوب" عند تقدم الإصابة', cf=MATCH.cf1),
+                Symptom(name='تساقط الأوراق وضعف التمثيل الضوئي', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    )
+    def cercospora_leaf_spot_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض تبقّع الأوراق (Cercospora) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="تبقّع الأوراق"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='بقع دائرية داكنة على الأوراق، غالبًا محاطة بهالة صفراء', cf=MATCH.cf1),
+            Symptom(name='انثقاب البقع وتحولها إلى "ثقوب" عند تقدم الإصابة', cf=MATCH.cf1),
+            Symptom(name='تساقط الأوراق وضعف التمثيل الضوئي', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    )
+    def cercospora_leaf_spot_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض تبقّع الأوراق (Cercospora) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="تبقّع الأوراق"))
+
+
+    @Rule(Fact(disease="تبقّع الأوراق"))
+    def cercospora_leaf_spot_treatment(self):
+        print("\n📌 المسبب: مرض تبقّع الأوراق في الباذنجان يُسببه الفطر Alternaria solani.")
+        print("\n💡 العلاج (مرض تبقّع الأوراق - Cercospora):")
+        print("- رش النبات بمبيد فطري وقائي مثل مبيدات تحتوي على النحاس أو البنزيميدازول.")
+        print("- إزالة الأوراق المصابة فورًا ومنع تراكم بقايا النباتات حول الأشجار.")
+        print("- تحسين التهوية وتقليل الرطوبة حول النباتات.")
+        print("- تجنب الري بالرش والتركيز على الري الجذري.")
+        print("- زراعة أصناف مقاومة للمرض إن أمكن.")
+        self.halt()
+
+
+    #عفن الساق
+
+    @Rule(
+        Symptom(name='إعوجاجات وتفحم في قاعدة الساق عند سطح التربة', cf=MATCH.cf1),
+        Symptom(name='ظهور شبكة من الفطريات البيضاء وثم "جذور سوداء" (sclerotia)', cf=MATCH.cf2),
+        Symptom(name='ذبول وموت مفاجئ للنبات حتى في الطقس المعتدل', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def sclerotium_rot_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض عفن الساق (Sclerotium Rot) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="عفن الساق"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='إعوجاجات وتفحم في قاعدة الساق عند سطح التربة', cf=MATCH.cf1),
+                Symptom(name='ظهور شبكة من الفطريات البيضاء وثم "جذور سوداء" (sclerotia)', cf=MATCH.cf2)),
+            AND(Symptom(name='إعوجاجات وتفحم في قاعدة الساق عند سطح التربة', cf=MATCH.cf1),
+                Symptom(name='ذبول وموت مفاجئ للنبات حتى في الطقس المعتدل', cf=MATCH.cf2)),
+            AND(Symptom(name='ظهور شبكة من الفطريات البيضاء وثم "جذور سوداء" (sclerotia)', cf=MATCH.cf1),
+                Symptom(name='ذبول وموت مفاجئ للنبات حتى في الطقس المعتدل', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    )
+    def sclerotium_rot_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض عفن الساق (Sclerotium Rot) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="عفن الساق"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='إعوجاجات وتفحم في قاعدة الساق عند سطح التربة', cf=MATCH.cf1),
+            Symptom(name='ظهور شبكة من الفطريات البيضاء وثم "جذور سوداء" (sclerotia)', cf=MATCH.cf1),
+            Symptom(name='ذبول وموت مفاجئ للنبات حتى في الطقس المعتدل', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    )
+    def sclerotium_rot_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض عفن الساق (Sclerotium Rot) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="عفن الساق"))
+
+
+    @Rule(Fact(disease="عفن الساق"))
+    def sclerotium_rot_treatment(self):
+        print("\n📌 المسبب: مرض عفن الساق في الباذنجان يُسببه الفطر Rhizoctonia solani.")
+        print("\n💡 العلاج (مرض عفن الساق - Sclerotium Rot):")
+        print("- إزالة وإتلاف النباتات المصابة فورًا (لا تُعاد كسماد).")
+        print("- تعقيم التربة باستخدام البخار أو مبيدات الفطريات الوقائية.")
+        print("- تحسين تصريف التربة وتقليل الرطوبة حول قاعدة النباتات.")
+        print("- تجنب الزراعة الكثيفة وتحسين التهوية.")
+        print("- استخدام أصناف مقاومة إن أمكن.")
+        self.halt()
+</file>
+
+<file path="garlic_rules.py">
+from experta import Rule, Fact, MATCH, TEST, OR, AND
+from core import Symptom, PlantDiagnosisEngine
+
+class GarlicRules(PlantDiagnosisEngine):
+
+    #البياض الزعبي
+    @Rule(
+        Symptom(name='اصفرار الأوراق من الأطراف نحو القاعدة', cf=MATCH.cf1),
+        Symptom(name='ظهور نمو رمادي مزرق على السطح السفلي للأوراق', cf=MATCH.cf2),
+        Symptom(name='تدهور مبكر للنباتات وسقوط الأوراق', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def downy_mildew_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض البياض الزغبي (Peronospora destructor) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="البياض الزغبي"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='اصفرار الأوراق من الأطراف نحو القاعدة', cf=MATCH.cf1),
+                Symptom(name='ظهور نمو رمادي مزرق على السطح السفلي للأوراق', cf=MATCH.cf2)),
+            AND(Symptom(name='اصفرار الأوراق من الأطراف نحو القاعدة', cf=MATCH.cf1),
+                Symptom(name='تدهور مبكر للنباتات وسقوط الأوراق', cf=MATCH.cf2)),
+            AND(Symptom(name='ظهور نمو رمادي مزرق على السطح السفلي للأوراق', cf=MATCH.cf1),
+                Symptom(name='تدهور مبكر للنباتات وسقوط الأوراق', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
+    )
+    def downy_mildew_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: مرض البياض الزغبي (Peronospora destructor) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="البياض الزغبي"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='اصفرار الأوراق من الأطراف نحو القاعدة', cf=MATCH.cf1),
+            Symptom(name='ظهور نمو رمادي مزرق على السطح السفلي للأوراق', cf=MATCH.cf1),
+            Symptom(name='تدهور مبكر للنباتات وسقوط الأوراق', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def downy_mildew_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض البياض الزغبي (Peronospora destructor) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="البياض الزغبي"))
+
+
+    @Rule(Fact(disease="البياض الزغبي"), salience=5)
+    def garlic_downy_mildew_treatment(self):
+        print("\n📌 المسبب: مرض البياض الزغبي في الثوم يُسببه الفطر Peronospora destructor.")
+        print("\n💡 العلاج (مرض البياض الزغبي - Peronospora destructor):")
+        print("- رش النبات بمبيد فطري وقائي مثل مبيدات النحاس أو مانكوزيب.")
+        print("- تجنب الري بالرش ويفضل الري الجذري لتقليل الرطوبة على الأوراق.")
+        print("- تحسين التهوية وتقليل كثافة الزراعة.")
+        print("- إزالة وإتلاف الأجزاء المصابة فورًا.")
+        print("- زراعة أصناف مقاومة للمرض إن أمكن.")
+        self.halt()
+
+
+
+
+       #العفن الرمادي
+    @Rule(
+        Symptom(name='رقّة قاعدة الساق (العنق) وتلونها بلون بني رمادي', cf=MATCH.cf1),
+        Symptom(name='ظهور زغب رمادي على العنق أثناء التخزين', cf=MATCH.cf2),
+        Symptom(name='تفكك أنسجة العنق وتعفن البصلة من الأعلى', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def gray_neck_rot_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض عفن العنق الرمادي (Botrytis allii) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="عفن العنق الرمادي"))
+
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='رقّة قاعدة الساق (العنق) وتلونها بلون بني رمادي', cf=MATCH.cf1),
+                Symptom(name='ظهور زغب رمادي على العنق أثناء التخزين', cf=MATCH.cf2)),
+            AND(Symptom(name='رقّة قاعدة الساق (العنق) وتلونها بلون بني رمادي', cf=MATCH.cf1),
+                Symptom(name='تفكك أنسجة العنق وتعفن البصلة من الأعلى', cf=MATCH.cf2)),
+            AND(Symptom(name='ظهور زغب رمادي على العنق أثناء التخزين', cf=MATCH.cf1),
+                Symptom(name='تفكك أنسجة العنق وتعفن البصلة من الأعلى', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
+    )
+    def gray_neck_rot_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض عفن العنق الرمادي (Botrytis allii) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="عفن العنق الرمادي"))
+
+
+
+    @Rule(
+        OR(
+            Symptom(name='رقّة قاعدة الساق (العنق) وتلونها بلون بني رمادي', cf=MATCH.cf1),
+            Symptom(name='ظهور زغب رمادي على العنق أثناء التخزين', cf=MATCH.cf1),
+            Symptom(name='تفكك أنسجة العنق وتعفن البصلة من الأعلى', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def gray_neck_rot_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض عفن العنق الرمادي (Botrytis allii) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="عفن العنق الرمادي"))
+
+
+
+    @Rule(Fact(disease="عفن العنق الرمادي"), salience=5)
+    def gray_neck_rot_treatment(self):
+        print("\n📌 المسبب: مرض العفن الرمادي في الثوم يُسببه الفطر Botrytis allii.")
+        print("\n💡 العلاج (مرض عفن العنق الرمادي - Botrytis allii):")
+        print("- تجنب الإفراط في الري قبل الحصاد لتجنب ترطيب الأعناق.")
+        print("- تجفيف البصليات جيدًا قبل التخزين.")
+        print("- تخزين البصل في مكان جيد التهوية ومنخفض الرطوبة.")
+        print("- رش النباتات قبل الحصاد بمبيد فطري وقائي (مثل مبيدات تحتوي على مانكوزيب أو فولبيك).")
+        print("- إزالة وإتلاف البصليات المصابة قبل التخزين.")
+        self.halt()
+
+
+
+
+
+    #عفن الزرقاء
+
+    @Rule(
+        Symptom(name='بقع مائية على البصلة تبدأ من الجروح', cf=MATCH.cf1),
+        Symptom(name='نمو فطري أزرق مخضر على سطح البصلة', cf=MATCH.cf2),
+        Symptom(name='رائحة عفن نفاذة عند شق البصلة', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def blue_mold_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض عفن الزُرقاء (Penicillium hirsutum) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="عفن الزُرقاء"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع مائية على البصلة تبدأ من الجروح', cf=MATCH.cf1),
+                Symptom(name='نمو فطري أزرق مخضر على سطح البصلة', cf=MATCH.cf2)),
+            AND(Symptom(name='بقع مائية على البصلة تبدأ من الجروح', cf=MATCH.cf1),
+                Symptom(name='رائحة عفن نفاذة عند شق البصلة', cf=MATCH.cf2)),
+            AND(Symptom(name='نمو فطري أزرق مخضر على سطح البصلة', cf=MATCH.cf1),
+                Symptom(name='رائحة عفن نفاذة عند شق البصلة', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
+    )
+    def blue_mold_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض عفن الزُرقاء (Penicillium hirsutum) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="عفن الزُرقاء"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='بقع مائية على البصلة تبدأ من الجروح', cf=MATCH.cf1),
+            Symptom(name='نمو فطري أزرق مخضر على سطح البصلة', cf=MATCH.cf1),
+            Symptom(name='رائحة عفن نفاذة عند شق البصلة', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def blue_mold_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض عفن الزُرقاء (Penicillium hirsutum) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="عفن الزُرقاء"))
+
+
+    @Rule(Fact(disease="عفن الزُرقاء"), salience=5)
+    def blue_mold_treatment(self):
+        print("\n📌 المسبب: مرض عفن الزرقاء في الثوم يُسببه الفطر Penicillium allii.")
+        print("\n💡 العلاج (مرض عفن الزُرقاء - Penicillium hirsutum):")
+        print("- تجنب إحداث جروح في البصل أثناء الحصاد.")
+        print("- تجفيف البصل جيدًا قبل التخزين.")
+        print("- تخزين البصل في مكان جيد التهوية ومنخفض الرطوبة.")
+        print("- فرز البصل بعناية وإزالة المصابة قبل التخزين.")
+        print("- تعقيم أدوات الحصاد وأماكن التخزين.")
+        self.halt()
+
+
+    #العفن الابيض
+    @Rule(
+        Symptom(name='اصفرار الأوراق وذبول مفاجئ للنبات', cf=MATCH.cf1),
+        Symptom(name='نمو أبيض قطني كثيف على قاعدة النبات', cf=MATCH.cf2),
+        Symptom(name='ظهور أجسام سوداء صغيرة (سكليروشيا) في التربة حول الجذور', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def white_rot_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض العفن الأبيض (Stromatinia cepivora) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="العفن الأبيض"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='اصفرار الأوراق وذبول مفاجئ للنبات', cf=MATCH.cf1),
+                Symptom(name='نمو أبيض قطني كثيف على قاعدة النبات', cf=MATCH.cf2)),
+            AND(Symptom(name='اصفرار الأوراق وذبول مفاجئ للنبات', cf=MATCH.cf1),
+                Symptom(name='ظهور أجسام سوداء صغيرة (سكليروشيا) في التربة حول الجذور', cf=MATCH.cf2)),
+            AND(Symptom(name='نمو أبيض قطني كثيف على قاعدة النبات', cf=MATCH.cf1),
+                Symptom(name='ظهور أجسام سوداء صغيرة (سكليروشيا) في التربة حول الجذور', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
+    )
+    def white_rot_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: مرض العفن الأبيض (Stromatinia cepivora) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="العفن الأبيض"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='اصفرار الأوراق وذبول مفاجئ للنبات', cf=MATCH.cf1),
+            Symptom(name='نمو أبيض قطني كثيف على قاعدة النبات', cf=MATCH.cf1),
+            Symptom(name='ظهور أجسام سوداء صغيرة (سكليروشيا) في التربة حول الجذور', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def white_rot_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض العفن الأبيض (Stromatinia cepivora) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="العفن الأبيض"))
+
+
+    @Rule(Fact(disease="العفن الأبيض"), salience=5)
+    def white_rot_treatment(self):
+        print("\n📌 المسبب: مرض العفن الأبيض في الثوم يُسببه الفطر Sclerotium cepivorum.")
+        print("\n💡 العلاج (مرض العفن الأبيض - Stromatinia cepivora):")
+        print("- تجنب زراعة البصل أو الثوم في نفس التربة المصابة لمدة 4-5 سنوات.")
+        print("- تعقيم التربة بالبخار أو مواد كيميائية قبل الزراعة.")
+        print("- إزالة وإتلاف النباتات المصابة مع التربة المحيطة بها.")
+        print("- زراعة أصناف مقاومة إن أمكن.")
+        print("- تجنب الرطوبة العالية وتحسين تصريف التربة.")
+        self.halt()
+
+
+
+
+
+    @Rule(
+        Symptom(name='تبرقش أصفر أو أخضر فاتح على الأوراق الطرية', cf=MATCH.cf1),
+        Symptom(name='تقزم النبات وضعف في تكوين الأبصال', cf=MATCH.cf2),
+        Symptom(name='تشوه في شكل الأوراق وتأخر في النمو', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def viral_complex_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: الذبول الفيروسي المشترك (OYDV – GCLV – LYSV – SLV) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="الذبول الفيروسي المشترك"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='تبرقش أصفر أو أخضر فاتح على الأوراق الطرية', cf=MATCH.cf1),
+                Symptom(name='تقزم النبات وضعف في تكوين الأبصال', cf=MATCH.cf2)),
+            AND(Symptom(name='تبرقش أصفر أو أخضر فاتح على الأوراق الطرية', cf=MATCH.cf1),
+                Symptom(name='تشوه في شكل الأوراق وتأخر في النمو', cf=MATCH.cf2)),
+            AND(Symptom(name='تقزم النبات وضعف في تكوين الأبصال', cf=MATCH.cf1),
+                Symptom(name='تشوه في شكل الأوراق وتأخر في النمو', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
+    )
+    def viral_complex_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: الذبول الفيروسي المشترك (OYDV – GCLV – LYSV – SLV) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="الذبول الفيروسي المشترك"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='تبرقش أصفر أو أخضر فاتح على الأوراق الطرية', cf=MATCH.cf1),
+            Symptom(name='تقزم النبات وضعف في تكوين الأبصال', cf=MATCH.cf1),
+            Symptom(name='تشوه في شكل الأوراق وتأخر في النمو', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def viral_complex_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: الذبول الفيروسي المشترك (OYDV – GCLV – LYSV – SLV) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="الذبول الفيروسي المشترك"))
+
+
+    @Rule(Fact(disease="الذبول الفيروسي المشترك"), salience=5)
+    def viral_complex_treatment(self):
+        print("\n📌 المسبب: فيروس الذبول المشترك للثوم (Garlic Common Yellowing Virus) - GCLYV")
+        print("\n💡 العلاج (الذبول الفيروسي المشترك ):")
+        print("- لا يوجد علاج فعّال للعدوى الفيروسية.")
+        print("- إزالة وإتلاف النباتات المصابة فورًا لتجنب انتشار الفيروس.")
+        print("- مكافحة الآفات الناقلة (خاصة المن) باستخدام مبيدات حشرية.")
+        print("- استخدام بذور أو شتلات خالية من الفيروس.")
+        print("- زراعة أصناف مقاومة أو مطعّمة.")
+        print("- تجنب زراعة البصل بالقرب من محاصيل مصابة (مثل الثوم أو الكزبرة).")
+        self.halt()
+</file>
+
+<file path="grape_rules.py">
+from experta import Rule, Fact, MATCH, TEST, OR, AND
+from core import Symptom, PlantDiagnosisEngine
+
+class GrapeRules(PlantDiagnosisEngine):
+
+    #البياض الزغبي
+    @Rule(
+        Symptom(name='بقع صفراء على الأوراق', cf=MATCH.cf1),
+        Symptom(name='نمو أبيض قطني تحت الأوراق', cf=MATCH.cf2),
+        Symptom(name='ذبول الأوراق وسقوطها', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60),
+
+    )
+    def downy_mildew_full(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: البياض الزغبي (العنب) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="البياض الزغبي"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع صفراء على الأوراق', cf=MATCH.cf1),
+                Symptom(name='نمو أبيض قطني تحت الأوراق', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='بقع صفراء على الأوراق', cf=MATCH.cf1),
+                Symptom(name='ذبول الأوراق وسقوطها', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='نمو أبيض قطني تحت الأوراق', cf=MATCH.cf1),
+                Symptom(name='ذبول الأوراق وسقوطها', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+
+        ),
+        salience=11
+
+    )
+    def downy_mildew_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: البياض الزغبي (العنب) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
+        self.declare(Fact(disease="البياض الزغبي"))
+        self.halt()
+
+
+
+    @Rule(
+        OR(
+            Symptom(name='بقع صفراء على الأوراق', cf=MATCH.cf1),
+            Symptom(name='نمو أبيض قطني تحت الأوراق', cf=MATCH.cf1),
+            Symptom(name='ذبول الأوراق وسقوطها', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60),
+        salience=10
+
+    )
+    def downy_mildew_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: البياض الزغبي (العنب) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
+        self.declare(Fact(disease="البياض الزغبي"))
+        self.halt()
+
+
+    @Rule(Fact(disease="البياض الزغبي"))
+    def downy_mildew_treatment(self):
+        print("\n📌 المسبب: مرض البياض الزغبي في العنب يُسببه الفطر Plasmopara viticola.")
+        print("\n💡 العلاج (البياض الزغبي - العنب):")
+        print("- رش مبيد فطري يحتوي على Metalaxyl أو Mancozeb")
+        print("- تكرار الرش كل 7–10 أيام حسب الظروف الجوية")
+        print("- تحسين التهوية والتخلص من الأجزاء المصابة")
+        self.halt()
+
+
+
+    #  العفن الرمادي
+    @Rule(
+        Symptom(name='بقع رمادية على العناقيد', cf=MATCH.cf1),
+        Symptom(name='تعفن طري على الثمار', cf=MATCH.cf2),
+        Symptom(name='وجود زغب رمادي اللون', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def gray_mold_full(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: العفن الرمادي (العنب) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="العفن الرمادي"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع رمادية على العناقيد', cf=MATCH.cf1),
+                Symptom(name='تعفن طري على الثمار', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='بقع رمادية على العناقيد', cf=MATCH.cf1),
+                Symptom(name='وجود زغب رمادي اللون', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='تعفن طري على الثمار', cf=MATCH.cf1),
+                Symptom(name='وجود زغب رمادي اللون', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
+        )
+    )
+    def gray_mold_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: العفن الرمادي (العنب) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="العفن الرمادي"))
+
+    @Rule(
+        OR(
+            Symptom(name='بقع رمادية على العناقيد', cf=MATCH.cf1),
+            Symptom(name='تعفن طري على الثمار', cf=MATCH.cf1),
+            Symptom(name='وجود زغب رمادي اللون', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    )
+    def gray_mold_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: العفن الرمادي (العنب) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="العفن الرمادي"))
+
+    @Rule(Fact(disease="العفن الرمادي"))
+    def gray_mold_treatment(self):
+        print("\n📌 المسبب: مرض العفن الرمادي في العنب يُسببه الفطر Botrytis cinerea.")
+        print("\n💡 العلاج (العفن الرمادي - العنب):")
+        print("- إزالة العناقيد والثمار المصابة فورًا")
+        print("- تحسين التهوية والتعرض لأشعة الشمس بالتقليم")
+        print("- استخدام مبيدات فطرية مثل: iprodione أو fenhexamid قبل الإزهار وبعده")
+        print("- تجنب الرطوبة الزائدة وري النباتات في الصباح الباكر")
+        self.halt()
+
+
+
+
+    #  البياض الدقيقي
+    @Rule(
+        Symptom(name='مسحوق أبيض على سطح الأوراق والثمار', cf=MATCH.cf1),
+        Symptom(name='تشوه الثمار وتوقف نموها', cf=MATCH.cf2),
+        Symptom(name='تشقق الثمار وتلفها', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def grape_powdery_mildew_full(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: البياض الدقيقي (العنب) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="البياض الدقيقي - العنب"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='مسحوق أبيض على سطح الأوراق والثمار', cf=MATCH.cf1),
+                Symptom(name='تشوه الثمار وتوقف نموها', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='مسحوق أبيض على سطح الأوراق والثمار', cf=MATCH.cf1),
+                Symptom(name='تشقق الثمار وتلفها', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='تشوه الثمار وتوقف نموها', cf=MATCH.cf1),
+                Symptom(name='تشقق الثمار وتلفها', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
+        )
+    )
+    def grape_powdery_mildew_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: البياض الدقيقي (العنب) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="البياض الدقيقي - العنب"))
+
+    @Rule(
+        OR(
+            Symptom(name='مسحوق أبيض على سطح الأوراق والثمار', cf=MATCH.cf1),
+            Symptom(name='تشوه الثمار وتوقف نموها', cf=MATCH.cf1),
+            Symptom(name='تشقق الثمار وتلفها', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    )
+    def grape_powdery_mildew_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: البياض الدقيقي (العنب) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="البياض الدقيقي - العنب"))
+
+    @Rule(Fact(disease="البياض الدقيقي - العنب"))
+    def grape_powdery_mildew_treatment(self):
+        print("\n📌 المسبب: مرض البياض الدقيقي في العنب يُسببه الفطر Erysiphe necator.")
+        print("\n💡 العلاج (البياض الدقيقي - العنب):")
+        print("- رش الكبريت القابل للبلل أو مبيدات تحتوي على Myclobutanil")
+        print("- التكرار كل 10 أيام خلال الفترة الحساسة (قبل الإزهار وحتى نضج الثمار)")
+        print("- تقليل الرطوبة وتحسين التهوية بالتقليم")
+        print("- إزالة الأجزاء المصابة وتقليل التزاحم بين العناقيد")
+        self.halt()
+
+
+
+    #عفن الحذور
+    @Rule(
+        Symptom(name='ذبول الأوراق وسقوطها', cf=MATCH.cf1),
+        Symptom(name='بقع صفراء على الأوراق', cf=MATCH.cf2),
+        Symptom(name='توقف نمو النبات أو موته المفاجئ', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60),
+    )
+    def root_rot_full(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.9)
+        print(f"\n✅ تشخيص دقيق: عفن الجذور (العنب) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="عفن الجذور"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='ذبول الأوراق وسقوطها', cf=MATCH.cf1),
+                Symptom(name='بقع صفراء على الأوراق', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='ذبول الأوراق وسقوطها', cf=MATCH.cf1),
+                Symptom(name='توقف نمو النبات أو موته المفاجئ', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='بقع صفراء على الأوراق', cf=MATCH.cf1),
+                Symptom(name='توقف نمو النبات أو موته المفاجئ', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+        ),
+
+        salience = 6
+
+    )
+    def root_rot_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: عفن الجذور (العنب) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
+        self.declare(Fact(disease="عفن الجذور"))
+        self.halt()
+
+
+    @Rule(
+        OR(
+            Symptom(name='ذبول الأوراق وسقوطها', cf=MATCH.cf1),
+            Symptom(name='بقع صفراء على الأوراق', cf=MATCH.cf1),
+            Symptom(name='توقف نمو النبات أو موته المفاجئ', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60),
+        salience=5
+    )
+    def root_rot_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: عفن الجذور (العنب) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص بسبب التشابه مع مرض اخر")
+        self.declare(Fact(disease="عفن الجذور"))
+        self.halt()
+
+
+    @Rule(Fact(disease="عفن الجذور"))
+    def root_rot_treatment(self):
+        print("\n📌 المسبب: مرض عفن الجذور في العنب يُسببه الفطر Phytophthora spp.")
+        print("\n💡 العلاج (عفن الجذور - العنب):")
+        print("- تحسين صرف التربة لتجنب تجمع المياه")
+        print("- تقليل الري في التربة الطينية الثقيلة")
+        print("- إزالة النباتات المصابة بالكامل لمنع الانتشار")
+        print("- يمكن استخدام مبيدات فطرية مثل Metalaxyl حسب توصيات المختصين")
+        self.halt()
+</file>
+
+<file path="main.py">
+import collections
+import collections.abc
+collections.Mapping = collections.abc.Mapping
+
+from experta import *
+from cherry_rules import CherryRules
+from apple_rules import AppleRules
+from grape_rules import GrapeRules
+from tomato_rules import TomatoRules
+from core import Symptom
+from Potato_rules import PotatoRules
+from citrus_rules import CitrusRules
+from zucchini_rules import ZucchiniRules
+from eggplant_rules import EggplantRules
+from onion_rules import OnionRules
+from garlic_rules import GarlicRules
+
+# ✅ اختيار النظام المناسب حسب النبات
+engines = {
+    1: ("تفاح", AppleRules),
+    2: ("كرز", CherryRules),
+    3: ("عنب", GrapeRules),
+    4: ("طماطم", TomatoRules),
+    5: ("بطاطا", PotatoRules),
+    6: ("حمضيات", CitrusRules),
+    7: ("كوسا", ZucchiniRules),
+    8: ("باذنجان", EggplantRules),
+    9: ("البصل", OnionRules),
+    10: ("الثوم", GarlicRules),
+}
+
+# جميع الأعراض حسب النبات المختار
+symptoms_by_crop = {
+    "تفاح": [
+        "بقع زيتية على الأوراق",
+        "تشوه الثمار",
+        "تقشر لون الأوراق",
+        "بقع بنفسجية على الأوراق",
+        "تقرحات على الأغصان",
+        "تعفن بني على الثمار",
+        "بقع صفراء على الأوراق",
+        "أورام برتقالية",
+        "تورم الأوراق من الأسفل"
+    ],
+    "كرز": [
+        "بقع بيضاء على سطح الأوراق",
+        "تشوه الأوراق",
+        "تبقع وتلف الثمار",
+        "بقع أرجوانية أو حمراء على الأوراق",
+        "ثقوب دائرية في الأوراق",
+        "بقع داكنة على الثمار",
+        "بقع بنية طرية على الثمار",
+        "ظهور دوائر بيضاء من الأبواغ",
+        "تعفن الثمار وتساقطها",
+        "تقرحات غائرة على الساق أو الأغصان",
+        "تسرب صمغ من أماكن التقرحات",
+        "ذبول مفاجئ للأوراق أو الأغصان"
+    ],
+    "عنب": [
+        "بقع صفراء على الأوراق",
+        "نمو أبيض قطني تحت الأوراق",
+        "ذبول الأوراق وسقوطها",
+        "بقع رمادية على العناقيد",
+        "تعفن طري على الثمار",
+        "وجود زغب رمادي اللون",
+        "مسحوق أبيض على سطح الأوراق والثمار",
+        "تشوه الثمار وتوقف نموها",
+        "تشقق الثمار وتلفها",
+        "توقف نمو النبات أو موته المفاجئ"
+    ],
+    "طماطم": [
+        "هالات صفراء حول البقع",
+        "ذبول الأوراق السفلية",
+        "بقع بنية مائية على حواف الأوراق",
+        "تعفن بني على السيقان أو الثمار",
+        "ظهور زغب رمادي أو أبيض تحت الأوراق",
+        "ذبول مفاجئ دون اصفرار",
+        "لا يظهر تعفن على الساق",
+        "إفرازات مخاطية من قاعدة الساق",
+        "بقع بنية مائية على الأوراق",
+        "تشقق الجلد على الثمار",
+        "تساقط الأوراق",
+        "بقعة سوداء غائرة في أسفل الثمرة",
+        "تصبح قاسية وجافة",
+        "تبرقش في لون الأوراق (أخضر فاتح/غامق)",
+        "تشوه شكل الأوراق",
+        "صغر حجم الثمار"
+    ],
+    "بطاطا": [
+        "بقع مائية داكنة على الأوراق",
+        "هالات خضراء إلى بنية على الساق",
+        "تعفن بني على الدرنات",
+        "ورقة ناصعة اللون أو موزاييك مصفر",
+        "تشوه أو تجعد الأوراق",
+        "بقع سوداء صلبة على الدرنات",
+        "آفات في الساق عند القاعدة",
+        "ظهور بثور صغيرة بيضاء أو بنية على الدرنات",
+        "تشوه سطح الدرنات",
+        "تندّب أو تقشير جلدي في منطقة القروح"
+    ],
+    "حمضيات": [
+        "اصفرار وتمدد للأوراق والشعيرات الخشبية",
+        "ذبول وفناء أجزاء من الفروع",
+        "إفرازات صمغية وردية أو رمادية في الجذوع",
+        "بقع داكنة أو تكاثف للنسيج الخشبي تحت اللحاء",
+        "إفرازات صمغية سوداء أو بنية عند قاعدة الجذع",
+        "تقرحات أو تصدعات في اللحاء بالقرب من سطح التربة",
+        "ذبول الأصناف وضعف نمو الأورقات",
+        "اختناق النسيج الوعائي وموت الفروع",
+        "تجعد أو تساقط الأوراق",
+        "ضعف في النمو، وقلة الإنتاجية",
+        "بقع داكنة غائرة على الثمار",
+        "تساقط مبكر للثمار",
+        "بقع صغيرة على الأوراق في بعض الحالات",
+        "تقرحات مائية على الأوراق والسيقان والثمار",
+        "يحيط بها هالة صفراء",
+        "بقع صفراء-بنية لامعة على السطح السفلي للأوراق"
+    ],
+    "كوسا": [
+        "فسيفساء (mosaic) وتبقع أصفر على الأوراق",
+        "تشوه وتقزز أوراق الكوسا",
+        "ثمار مشوّهة أو ملوّنة وغير منتظمة",
+        "مسحوق أبيض رمادي يغطي السطح العلوي أو السفلي للأوراق",
+        "اصفرار وتجعيد الأوراق مسبقًا",
+        "تباطؤ نمو النبات وجفاف الأوراق المتقدمة",
+        "ذبول فوري للنبات بدون اصفرار سابق",
+        "أوراق قد تتحوّل إلى لون أخضر داكن ممل أو باهت",
+        "سوائل مخاطية على جذع النبات عند القطع",
+        "بقع دائرية مائية على الأوراق",
+        "تقرحات وسوائل بنية/لزجة تنطلق من الساق",
+        "تعفن الثمار أو صدأ على الثمار"
+    ],
+    "باذنجان": [
+        "ذبول مفاجئ للنبات بدون اصفرار سابق",
+        "تحول الساق الداخلي إلى اللون البني – يظهر عند قطع الجذع انسياب سائل مخاطي",
+        "موت النبات بالكامل، خصوصًا في الطقس الدافئ والرطب",
+        "اصفرار الأوراق السفلية تدريجيًا، ثم ذبولها",
+        "تظهر بقع بنية على الأوعية الوعائية داخل الساق عند تقطيعها",
+        "ضعف النمو وتراجع إنتاج الثمار",
+        "بقع بنية مائية على الثمار، خاصة في النبات السفلي",
+        "تعفن الساقين عند قاعدة النبات، مع ظهور طبقة بيضاء زغبية",
+        "بقع دائرية داكنة على الأوراق، غالبًا محاطة بهالة صفراء",
+        'انثقاب البقع وتحولها إلى "ثقوب" عند تقدم الإصابة',
+        "تساقط الأوراق وضعف التمثيل الضوئي",
+        "إعوجاجات وتفحم في قاعدة الساق عند سطح التربة",
+        'ظهور شبكة من الفطريات البيضاء وثم "جذور سوداء" (sclerotia)',
+        "ذبول وموت مفاجئ للنبات حتى في الطقس المعتدل"
+    ],
+    "البصل": [
+        "بقع صفراء باهتة أو بنية طويلة على الأوراق الخارجية قد تتحول إلى نمو رمادي-بنفسجي تحت الرطوبة",
+        "ذبول الأوراق المصابة وانحناؤها أو تساقطها",
+        "البصليات تصبح طرية ومائية بسبب المرض",
+        "بقعة مائية صغيرة تتحول إلى بقعة داكنة ذات هالة صفراء",
+        "تظهر بقعة هدف بنية-أرجوانية على الأوراق",
+        "انتشار البقع وقت المطر أو الرذاذ",
+        "طرى ورخاوة في قاعدة رقبة البصلة (الياقة)",
+        "ظهور نمو فطري رمادي أو زغب أسود على الياقة أو بين القشور",
+        "تعفن البصلة من الأعلى باتجاه الداخل أثناء التخزين",
+        "جذور مصابة تصبح وردية أولاً، ثم تتحول إلى حمراء أو أرجوانية",
+        "الجذور تصبح مائية وقابلة للتفتت",
+        "ضعف نمو النبات وجفافه حتى قبل إنضاج البصلية",
+        "تضخم في الجذوع السفلية وتعفن جزئي",
+        "أوراق ملتفة، صفراء وسريعة الذبول",
+        "البصليات مشوهة أو ناعمة، غير قابلة للبيع"
+    ],
+    "الثوم": [
+        "اصفرار الأوراق من الأطراف نحو القاعدة",
+        "ظهور نمو رمادي مزرق على السطح السفلي للأوراق",
+        "تدهور مبكر للنباتات وسقوط الأوراق",
+        "رقّة قاعدة الساق (العنق) وتلونها بلون بني رمادي",
+        "ظهور زغب رمادي على العنق أثناء التخزين",
+        "تفكك أنسجة العنق وتعفن البصلة من الأعلى",
+        "بقع مائية على البصلة تبدأ من الجروح",
+        "نمو فطري أزرق مخضر على سطح البصلة",
+        "رائحة عفن نفاذة عند شق البصلة",
+        "اصفرار الأوراق وذبول مفاجئ للنبات",
+        "نمو أبيض قطني كثيف على قاعدة النبات",
+        "ظهور أجسام سوداء صغيرة (سكليروشيا) في التربة حول الجذور",
+        "تبرقش أصفر أو أخضر فاتح على الأوراق الطرية",
+        "تقزم النبات وضعف في تكوين الأبصال",
+        "تشوه في شكل الأوراق وتأخر في النمو"
+    ]
+}
+
+if __name__ == "__main__":
+    while True:
+        print("\n🌿 اختر نوع النبات:")
+        for key, (name, _) in engines.items():
+            print(f"{key}. {name}")
+        print(f"{len(engines) + 1}. إنهاء البرنامج")
+
+        try:
+            crop_choice = int(input("\n🔢 أدخل رقم النبات: "))
+        except ValueError:
+            print("❌ إدخال غير صالح. يرجى إدخال رقم.")
+            continue
+
+        if crop_choice == len(engines) + 1:
+            print("👋 تم إنهاء البرنامج.")
+            break
+
+        if crop_choice not in engines:
+            print("❌ رقم غير صالح. حاول مرة أخرى.")
+            continue
+
+        crop_name, EngineClass = engines[crop_choice]
+        engine = EngineClass()
+        engine.reset()
+
+        symptoms = symptoms_by_crop[crop_name]
+
+        print(f"\n🔍 اختر الأعراض التي تلاحظها على {crop_name} من القائمة التالية:")
+        for i, symptom in enumerate(symptoms):
+            print(f"{i + 1}. {symptom}")
+
+        selected_indices = input("\n📌 أدخل أرقام الأعراض الموجودة (مفصولة بفاصلة): ")
+        indices = [int(i.strip()) - 1 for i in selected_indices.split(',') if
+                   i.strip().isdigit() and 0 < int(i.strip()) <= len(symptoms)]
+
+        for idx in indices:
+            try:
+                cf = int(input(f"📈 أدخل درجة التأكد (0-100) لعرض '{symptoms[idx]}': "))
+                if 0 <= cf <= 100:
+                    engine.declare(Symptom(name=symptoms[idx], cf=cf))
+            except:
+                print("⚠️ إدخال غير صالح، تم تجاهل العرض.")
+
+        engine.run()
+
+        # سؤال المستخدم بعد التشخيص
+        while True:
+            choice = input("\n🔁 هل تريد تشخيص مرض آخر؟ (نعم / لا): ").strip().lower()
+            if choice in ['لا', 'no', 'n']:
+                print("👋 تم إنهاء البرنامج.")
+                exit()
+            elif choice in ['نعم', 'yes', 'y']:
+                print("🔄 إعادة التشخيص...")
+                break
+            else:
+                print("❌ الرد غير مفهوم. يرجى الإجابة بـ 'نعم' أو 'لا'.")
+</file>
+
+<file path="onion_rules.py">
+from experta import Rule, Fact, MATCH, TEST, OR, AND
+from core import Symptom, PlantDiagnosisEngine
+
+class OnionRules(PlantDiagnosisEngine):
+
+    #البياض الزغبي
+    @Rule(
+        Symptom(name='بقع صفراء باهتة أو بنية طويلة على الأوراق الخارجية قد تتحول إلى نمو رمادي-بنفسجي تحت الرطوبة',
+                cf=MATCH.cf1),
+        Symptom(name='ذبول الأوراق المصابة وانحناؤها أو تساقطها', cf=MATCH.cf2),
+        Symptom(name='البصليات تصبح طرية ومائية بسبب المرض', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def peronospora_destructor_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض البيرونوسبورا (Peronospora destructor) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="البيرونوسبورا"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(
+                name='بقع صفراء باهتة أو بنية طويلة على الأوراق الخارجية قد تتحول إلى نمو رمادي-بنفسجي تحت الرطوبة',
+                cf=MATCH.cf1),
+                Symptom(name='ذبول الأوراق المصابة وانحناؤها أو تساقطها', cf=MATCH.cf2)),
+            AND(Symptom(
+                name='بقع صفراء باهتة أو بنية طويلة على الأوراق الخارجية قد تتحول إلى نمو رمادي-بنفسجي تحت الرطوبة',
+                cf=MATCH.cf1),
+                Symptom(name='البصليات تصبح طرية ومائية بسبب المرض', cf=MATCH.cf2)),
+            AND(Symptom(name='ذبول الأوراق المصابة وانحناؤها أو تساقطها', cf=MATCH.cf1),
+                Symptom(name='البصليات تصبح طرية ومائية بسبب المرض', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
+    )
+    def peronospora_destructor_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض البيرونوسبورا (Peronospora destructor) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="البيرونوسبورا"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='بقع صفراء باهتة أو بنية طويلة على الأوراق الخارجية قد تتحول إلى نمو رمادي-بنفسجي تحت الرطوبة',
+                    cf=MATCH.cf1),
+            Symptom(name='ذبول الأوراق المصابة وانحناؤها أو تساقطها', cf=MATCH.cf1),
+            Symptom(name='البصليات تصبح طرية ومائية بسبب المرض', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def peronospora_destructor_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض البيرونوسبورا (Peronospora destructor) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="البيرونوسبورا"))
+
+
+    @Rule(Fact(disease="البياض الزغبي"), salience=5)
+    def peronospora_destructor_treatment(self):
+        print("\n💡 العلاج (مرض البياض الزغبي - البصل):")
+        print("\n📌 المسبب: مرض البياض الزغبي في البصل يُسببه الفطر Peronospora destructor.")
+        print("- رش النبات بمبيد فطري وقائي مثل مبيدات النحاس أو مبيدات مانكوزيب.")
+        print("- تحسين التهوية وتقليل الرطوبة حول النباتات.")
+        print("- تجنب الزراعة الكثيفة وتحسين تباعد النباتات.")
+        print("- إزالة وإتلاف الأجزاء المصابة فورًا.")
+        print("- تجنب ري الأوراق بالرش، ويفضل الري الجذري.")
+        self.halt()
+
+
+
+
+
+    #بقعة البنفسج
+    @Rule(
+        Symptom(name='بقعة مائية صغيرة تتحول إلى بقعة داكنة ذات هالة صفراء', cf=MATCH.cf1),
+        Symptom(name='تظهر بقعة هدف بنية-أرجوانية على الأوراق', cf=MATCH.cf2),
+        Symptom(name='انتشار البقع وقت المطر أو الرذاذ', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def purple_blotch_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض بقعة البنفسج (Alternaria porri) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="بقعة البنفسج"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقعة مائية صغيرة تتحول إلى بقعة داكنة ذات هالة صفراء', cf=MATCH.cf1),
+                Symptom(name='تظهر بقعة هدف بنية-أرجوانية على الأوراق', cf=MATCH.cf2)),
+            AND(Symptom(name='بقعة مائية صغيرة تتحول إلى بقعة داكنة ذات هالة صفراء', cf=MATCH.cf1),
+                Symptom(name='انتشار البقع وقت المطر أو الرذاذ', cf=MATCH.cf2)),
+            AND(Symptom(name='تظهر بقعة هدف بنية-أرجوانية على الأوراق', cf=MATCH.cf1),
+                Symptom(name='انتشار البقع وقت المطر أو الرذاذ', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
+    )
+    def purple_blotch_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض بقعة البنفسج (Alternaria porri) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="بقعة البنفسج"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='بقعة مائية صغيرة تتحول إلى بقعة داكنة ذات هالة صفراء', cf=MATCH.cf1),
+            Symptom(name='تظهر بقعة هدف بنية-أرجوانية على الأوراق', cf=MATCH.cf1),
+            Symptom(name='انتشار البقع وقت المطر أو الرذاذ', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def purple_blotch_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض بقعة البنفسج (Alternaria porri) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="بقعة البنفسج"))
+
+
+    @Rule(Fact(disease="بقعة البنفسج"), salience=5)
+    def purple_blotch_treatment(self):
+        print("\n📌 المسبب: مرض بقعة البنفسج في البصل يُسببه الفطر Alternaria porri.")
+        print("\n💡 العلاج (مرض بقعة البنفسج - البصل):")
+        print("- رش النبات بمبيد فطري وقائي مثل مبيدات تحتوي على مانكوزيب أو ديتمان أو النحاس.")
+        print("- تجنب الري بالرش ويفضل الري الجذري لتقليل الرطوبة على الأوراق.")
+        print("- إزالة وإتلاف الأجزاء المصابة فورًا.")
+        print("- تحسين التهوية وتقليل كثافة الزراعة.")
+        print("- زراعة أصناف مقاومة للمرض إن أمكن.")
+        self.halt()
+
+
+
+    #عفن الجذور الوردي
+    @Rule(
+        Symptom(name='جذور مصابة تصبح وردية أولاً، ثم تتحول إلى حمراء أو أرجوانية', cf=MATCH.cf1),
+        Symptom(name='الجذور تصبح مائية وقابلة للتفتت', cf=MATCH.cf2),
+        Symptom(name='ضعف نمو النبات وجفافه حتى قبل إنضاج البصلية', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def pink_root_rot_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض عفن الجذور الوردي (Pink Root Rot) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="عفن الجذور الوردي"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='جذور مصابة تصبح وردية أولاً، ثم تتحول إلى حمراء أو أرجوانية', cf=MATCH.cf1),
+                Symptom(name='الجذور تصبح مائية وقابلة للتفتت', cf=MATCH.cf2)),
+            AND(Symptom(name='جذور مصابة تصبح وردية أولاً، ثم تتحول إلى حمراء أو أرجوانية', cf=MATCH.cf1),
+                Symptom(name='ضعف نمو النبات وجفافه حتى قبل إنضاج البصلية', cf=MATCH.cf2)),
+            AND(Symptom(name='الجذور تصبح مائية وقابلة للتفتت', cf=MATCH.cf1),
+                Symptom(name='ضعف نمو النبات وجفافه حتى قبل إنضاج البصلية', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
+    )
+    def pink_root_rot_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض عفن الجذور الوردي (Pink Root Rot) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="عفن الجذور الوردي"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='جذور مصابة تصبح وردية أولاً، ثم تتحول إلى حمراء أو أرجوانية', cf=MATCH.cf1),
+            Symptom(name='الجذور تصبح مائية وقابلة للتفتت', cf=MATCH.cf1),
+            Symptom(name='ضعف نمو النبات وجفافه حتى قبل إنضاج البصلية', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def pink_root_rot_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض عفن الجذور الوردي (Pink Root Rot) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="عفن الجذور الوردي"))
+
+
+    @Rule(Fact(disease="عفن الجذور الوردي"), salience=5)
+    def pink_root_rot_treatment(self):
+        print("\n📌 المسبب: مرض عفن الجذور الوردي في البصل يُسببه الفطر Fusarium oxysporum f. sp. cepae.")
+        print("\n💡 العلاج (مرض عفن الجذور الوردي - البصل):")
+        print("- زراعة أصناف مقاومة للمرض (إن وُجدت).")
+        print("- تدوير المحاصيل وعدم زراعة البصل في نفس التربة لمدة 3-4 سنوات.")
+        print("- تحسين تصريف التربة وتقليل الرطوبة الزائدة.")
+        print("- تعقيم التربة قبل الزراعة (إذا أمكن).")
+        print("- تجنب استخدام بذور أو شتلات ملوثة.")
+        self.halt()
+
+
+
+
+
+    #مرض الياقة
+
+    @Rule(
+        Symptom(name='طرى ورخاوة في قاعدة رقبة البصلة (الياقة)', cf=MATCH.cf1),
+        Symptom(name='ظهور نمو فطري رمادي أو زغب أسود على الياقة أو بين القشور', cf=MATCH.cf2),
+        Symptom(name='تعفن البصلة من الأعلى باتجاه الداخل أثناء التخزين', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def botrytis_neck_rot_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض عفن الياقة (Botrytis Neck Rot) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="عفن الياقة"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='طرى ورخاوة في قاعدة رقبة البصلة (الياقة)', cf=MATCH.cf1),
+                Symptom(name='ظهور نمو فطري رمادي أو زغب أسود على الياقة أو بين القشور', cf=MATCH.cf2)),
+            AND(Symptom(name='طرى ورخاوة في قاعدة رقبة البصلة (الياقة)', cf=MATCH.cf1),
+                Symptom(name='تعفن البصلة من الأعلى باتجاه الداخل أثناء التخزين', cf=MATCH.cf2)),
+            AND(Symptom(name='ظهور نمو فطري رمادي أو زغب أسود على الياقة أو بين القشور', cf=MATCH.cf1),
+                Symptom(name='تعفن البصلة من الأعلى باتجاه الداخل أثناء التخزين', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
+    )
+    def botrytis_neck_rot_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض عفن الياقة (Botrytis Neck Rot) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="عفن الياقة"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='طرى ورخاوة في قاعدة رقبة البصلة (الياقة)', cf=MATCH.cf1),
+            Symptom(name='ظهور نمو فطري رمادي أو زغب أسود على الياقة أو بين القشور', cf=MATCH.cf1),
+            Symptom(name='تعفن البصلة من الأعلى باتجاه الداخل أثناء التخزين', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def botrytis_neck_rot_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض عفن الياقة (Botrytis Neck Rot) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="عفن الياقة"))
+
+
+    @Rule(Fact(disease="عفن الياقة"), salience=5)
+    def botrytis_neck_rot_treatment(self):
+        print("\n📌 المسبب: مرض الياقة في البصل يُسببه الفطر Phytophthora nicotianae.")
+        print("\n💡 العلاج (مرض عفن الياقة - Botrytis Neck Rot):")
+        print("- تجنب الإفراط في الري قبل الحصاد لتجنب ترطيب الأعناق.")
+        print("- تجفيف البصليات جيدًا قبل التخزين.")
+        print("- تخزين البصل في مكان جيد التهوية ومنخفض الرطوبة.")
+        print("- رش النباتات قبل الحصاد بمبيد فطري وقائي (مثل مبيدات تحتوي على مانكوزيب أو فولبيك).")
+        print("- إزالة وإتلاف البصليات المصابة قبل التخزين.")
+        self.halt()
+
+
+
+
+
+
+    #مرض دودة جذع البصل
+
+    @Rule(
+        Symptom(name='تضخم في الجذوع السفلية وتعفن جزئي', cf=MATCH.cf1),
+        Symptom(name='أوراق ملتفة، صفراء وسريعة الذبول', cf=MATCH.cf2),
+        Symptom(name='البصليات مشوهة أو ناعمة، غير قابلة للبيع', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def stem_bulb_nematode_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض دودة جذع البصل (Ditylenchus dipsaci) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="دودة جذع البصل"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='تضخم في الجذوع السفلية وتعفن جزئي', cf=MATCH.cf1),
+                Symptom(name='أوراق ملتفة، صفراء وسريعة الذبول', cf=MATCH.cf2)),
+            AND(Symptom(name='تضخم في الجذوع السفلية وتعفن جزئي', cf=MATCH.cf1),
+                Symptom(name='البصليات مشوهة أو ناعمة، غير قابلة للبيع', cf=MATCH.cf2)),
+            AND(Symptom(name='أوراق ملتفة، صفراء وسريعة الذبول', cf=MATCH.cf1),
+                Symptom(name='البصليات مشوهة أو ناعمة، غير قابلة للبيع', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
+    )
+    def stem_bulb_nematode_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض دودة جذع البصل (Ditylenchus dipsaci) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="دودة جذع البصل"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='تضخم في الجذوع السفلية وتعفن جزئي', cf=MATCH.cf1),
+            Symptom(name='أوراق ملتفة، صفراء وسريعة الذبول', cf=MATCH.cf1),
+            Symptom(name='البصليات مشوهة أو ناعمة، غير قابلة للبيع', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def stem_bulb_nematode_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض دودة جذع البصل (Ditylenchus dipsaci) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="دودة جذع البصل"))
+
+
+    @Rule(Fact(disease="دودة جذع البصل"), salience=5)
+    def stem_bulb_nematode_treatment(self):
+        print("\n📌 المسبب: يرقات حشرة ذبابة جذع البصل (Delia antiqua)")
+        print("\n💡 العلاج (مرض دودة جذع البصل - Nematode):")
+        print("- زراعة أصناف مقاومة للديدان الخيطية (إن وُجدت).")
+        print("- تدوير المحاصيل وعدم زراعة البصل في نفس التربة لمدة 3-4 سنوات.")
+        print("- تعقيم التربة بالبخار أو مواد كيميائية قبل الزراعة.")
+        print("- إزالة وإتلاف النباتات المصابة والبصليات التالفة.")
+        print("- غمر التربة بالماء قبل الزراعة لقتل النيماتودا (في بعض الحالات).")
+        self.halt()
+</file>
+
+<file path="Potato_rules.py">
+from experta import Rule, Fact, MATCH, TEST, OR, AND
+from core import Symptom, PlantDiagnosisEngine
+
+class PotatoRules(PlantDiagnosisEngine):
+
+    #  اللفحة المتأخرة
+    @Rule(
+        Symptom(name='بقع مائية داكنة على الأوراق', cf=MATCH.cf1),
+        Symptom(name='هالات خضراء إلى بنية على الساق', cf=MATCH.cf2),
+        Symptom(name='تعفن بني على الدرنات', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def late_blight_full(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: اللفحة المتأخرة (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="اللفحة المتأخرة"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع مائية داكنة على الأوراق', cf=MATCH.cf1), Symptom(name='هالات خضراء إلى بنية على الساق', cf=MATCH.cf2), TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='بقع مائية داكنة على الأوراق', cf=MATCH.cf1), Symptom(name='تعفن بني على الدرنات', cf=MATCH.cf2), TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='هالات خضراء إلى بنية على الساق', cf=MATCH.cf1), Symptom(name='تعفن بني على الدرنات', cf=MATCH.cf2), TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
+        )
+    ,
+        salience=20
+    )
+    def late_blight_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: اللفحة المتأخرة (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="اللفحة المتأخرة"))
+
+    @Rule(
+        OR(
+            Symptom(name='بقع مائية داكنة على الأوراق', cf=MATCH.cf1),
+            Symptom(name='هالات خضراء إلى بنية على الساق', cf=MATCH.cf1),
+            Symptom(name='تعفن بني على الدرنات', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def late_blight_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: اللفحة المتأخرة (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="اللفحة المتأخرة"))
+
+    @Rule(Fact(disease="اللفحة المتأخرة"), salience=5)
+    def potato_late_blight_treatment(self):
+        print("\n📌 المسبب: مرض اللفحة المتأخرة في البطاطا يُسببه الفطر Phytophthora infestans.")
+        print("\n💡 العلاج (اللفحة المتأخرة - البطاطا):")
+        print("- استخدام مبيد فطري مثل Mancozeb أو Cymoxanil")
+        print("- رش عند بداية ظهور الأعراض مع تكرار كل 7-10 أيام")
+        self.halt()
+
+
+
+
+
+    #  فيروس PVY
+    @Rule(
+        Symptom(name='ورقة ناصعة اللون أو موزاييك مصفر', cf=MATCH.cf1),
+        Symptom(name='تشوه أو تجعد الأوراق', cf=MATCH.cf2),
+        Symptom(name='صغر حجم الدرنات', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def pvy_full(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: فيروس PVY (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="PVY"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='ورقة ناصعة اللون أو موزاييك مصفر', cf=MATCH.cf1), Symptom(name='تشوه أو تجعد الأوراق', cf=MATCH.cf2), TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='تشوه أو تجعد الأوراق', cf=MATCH.cf1), Symptom(name='صغر حجم الدرنات', cf=MATCH.cf2), TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='ورقة ناصعة اللون أو موزاييك مصفر', cf=MATCH.cf1), Symptom(name='صغر حجم الدرنات', cf=MATCH.cf2), TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
+        )
+    ,
+        salience=20
+    )
+    def pvy_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: فيروس PVY (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="PVY"))
+
+    @Rule(
+        OR(
+            Symptom(name='ورقة ناصعة اللون أو موزاييك مصفر', cf=MATCH.cf1),
+            Symptom(name='تشوه أو تجعد الأوراق', cf=MATCH.cf1),
+            Symptom(name='صغر حجم الدرنات', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def pvy_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: فيروس PVY (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="PVY"))
+
+    @Rule(Fact(disease="PVY"), salience=5)
+    def pvy_treatment(self):
+        print("\n📌 المسبب: فيروس اللفحة العصوية للبطاطا (Potato Virus Y) - PVY")
+        print("\n💡 العلاج (فيروس PVY - البطاطا):")
+        print("- لا يوجد علاج مباشر، يفضل استخدام درنات خالية من الفيروس")
+        print("- السيطرة على حشرات المن (ناقل رئيسي)")
+        print("- التخلص من النباتات المصابة")
+        self.halt()
+
+
+
+
+
+
+    #  Black Scurf
+    @Rule(
+        Symptom(name='بقع سوداء صلبة على الدرنات', cf=MATCH.cf1),
+        Symptom(name='آفات في الساق عند القاعدة', cf=MATCH.cf2),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=30
+    )
+    def black_scurf_full(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.85)
+        print(f"\n✅ التشخيص: عفن القشرة السوداء (Black Scurf) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="Black Scurf"))
+
+    @Rule(
+        OR(
+            Symptom(name='بقع سوداء صلبة على الدرنات', cf=MATCH.cf1),
+            Symptom(name='آفات في الساق عند القاعدة', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def black_scurf_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: عفن القشرة السوداء (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="Black Scurf"))
+
+    @Rule(Fact(disease="Black Scurf"), salience=5)
+    def black_scurf_treatment(self):
+        print("\n📌 المسبب: مرض القشرة السوداء (Black Scurf) في البطاطا يُسببه الفطر Rhizoctonia solani.")
+        print("\n💡 العلاج (عفن القشرة السوداء - البطاطا):")
+        print("- الزراعة في تربة جيدة التصريف وتغيير الدورة الزراعية")
+        print("- معالجة الدرنات قبل الزراعة بمبيد مناسب مثل flutolanil")
+        self.halt()
+
+
+
+
+
+        # عفن القروح الجذري
+        @Rule(
+            Symptom(name='ظهور بثور صغيرة بيضاء أو بنية على الدرنات', cf=MATCH.cf1),
+            Symptom(name='تشوه سطح الدرنات', cf=MATCH.cf2),
+            Symptom(name='تندّب أو تقشير جلدي في منطقة القروح', cf=MATCH.cf3),
+            TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+        ,
+            salience=30
+        )
+        def powdery_scab_full(self, cf1, cf2, cf3):
+            final = round(min(cf1, cf2, cf3) * 0.85)
+            print(f"\n✅ التشخيص: عفن القروح الجذري (البطاطا) (درجة الثقة: {final}/100)")
+            self.declare(Fact(disease="عفن القروح الجذري"))
+
+        @Rule(
+            OR(
+                AND(Symptom(name='ظهور بثور صغيرة بيضاء أو بنية على الدرنات', cf=MATCH.cf1),
+                    Symptom(name='تشوه سطح الدرنات', cf=MATCH.cf2),
+                    TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+                AND(Symptom(name='تشوه سطح الدرنات', cf=MATCH.cf1),
+                    Symptom(name='تندّب أو تقشير جلدي في منطقة القروح', cf=MATCH.cf2),
+                    TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+                AND(Symptom(name='ظهور بثور صغيرة بيضاء أو بنية على الدرنات', cf=MATCH.cf1),
+                    Symptom(name='تندّب أو تقشير جلدي في منطقة القروح', cf=MATCH.cf2),
+                    TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
+            )
+        ,
+            salience=20
+        )
+        def powdery_scab_partial(self, cf1=0, cf2=0):
+            final = round(min(cf1, cf2) * 0.65)
+            print(f"\n⚠️ تشخيص مبدئي: عفن القروح الجذري (البطاطا) (درجة الثقة: {final}/100)")
+            print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+            self.declare(Fact(disease="عفن القروح الجذري"))
+
+        @Rule(
+            OR(
+                Symptom(name='ظهور بثور صغيرة بيضاء أو بنية على الدرنات', cf=MATCH.cf1),
+                Symptom(name='تشوه سطح الدرنات', cf=MATCH.cf1),
+                Symptom(name='تندّب أو تقشير جلدي في منطقة القروح', cf=MATCH.cf1)
+            ),
+            TEST(lambda cf1: cf1 >= 60)
+        ,
+            salience=10
+        )
+        def powdery_scab_weak(self, cf1):
+            final = round(cf1 * 0.45)
+            print(f"\n❗ احتمال ضعيف: عفن القروح الجذري (البطاطا) (درجة الثقة: {final}/100)")
+            print("⚠️ يُنصح بإدخال المزيد من الأعراض لتحسين دقة التشخيص.")
+            self.declare(Fact(disease="عفن القروح الجذري"))
+
+        @Rule(Fact(disease="عفن القروح الجذري"), salience=5)
+        def powdery_scab_treatment(self):
+            print(
+                "\n📌 المسبب: مرض عفن القروح الجذري في البطاطا يُسببه الفطر Fusarium solani، وقد تشاركه فطريات أخرى مثل Rhizoctonia solani و Pythium spp.")
+            print("\n💡 العلاج (عفن القروح الجذري - البطاطا):")
+            print("- لا يوجد علاج فعال، لكن يمكن اتخاذ إجراءات وقائية:")
+            print("- زراعة درنات خالية من الإصابة")
+            print("- تجنّب التربة الثقيلة والرطبة")
+            print("- تطبيق دورات زراعية وعدم زراعة البطاطا في نفس المكان لعدة مواسم")
+            self.halt()
+</file>
+
+<file path="tomato_rules.py">
+from experta import Rule, Fact, MATCH, TEST, OR, AND
+from core import Symptom, PlantDiagnosisEngine
+
+class TomatoRules(PlantDiagnosisEngine):
+
+    # اللفحة المبكرة
+    @Rule(
+        Symptom(name='بقع بنية مائية على حواف الأوراق', cf=MATCH.cf1),
+        Symptom(name='هالات صفراء حول البقع', cf=MATCH.cf2),
+        Symptom(name='ذبول الأوراق السفلية', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def early_blight_full(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: اللفحة المبكرة (الطماطم) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="اللفحة المبكرة"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع بنية مائية على حواف الأوراق', cf=MATCH.cf1),
+                Symptom(name='هالات صفراء حول البقع', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='بقع بنية مائية على حواف الأوراق', cf=MATCH.cf1),
+                Symptom(name='ذبول الأوراق السفلية', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='هالات صفراء حول البقع', cf=MATCH.cf1),
+                Symptom(name='ذبول الأوراق السفلية', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+        )
+    )
+    def early_blight_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: اللفحة المبكرة (الطماطم) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="اللفحة المبكرة"))
+
+    @Rule(
+        OR(
+            Symptom(name='بقع بنية مائية على حواف الأوراق', cf=MATCH.cf1),
+            Symptom(name='هالات صفراء حول البقع', cf=MATCH.cf1),
+            Symptom(name='ذبول الأوراق السفلية', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60),
+        salience=5,
+    )
+    def early_blight_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: اللفحة المبكرة (الطماطم) (درجة الثقة: {final}/100)")
+        print("⚠️ يُنصح بإدخال المزيد من الأعراض لتأكيد التشخيص بسبب التشابه مع أعراض مرض آخر")
+        self.declare(Fact(disease="اللفحة المبكرة"))
+        self.halt()
+
+    @Rule(Fact(disease="اللفحة المبكرة"))
+    def early_blight_treatment(self):
+        print("\n📌 المسبب: مرض اللفحة المبكرة في الطماطم يُسببه الفطر Alternaria solani.")
+        print("\n💡 العلاج (اللفحة المبكرة - الطماطم):")
+        print("- إزالة الأوراق المصابة وتحسين التهوية")
+        print("- رش مبيدات فطرية تحتوي على Chlorothalonil أو Mancozeb")
+        print("- تجنب الري فوق الأوراق")
+        self.halt()
+
+
+
+
+    #اللفحة المتأخرة
+    @Rule(
+        Symptom(name='بقع بنية مائية على حواف الأوراق', cf=MATCH.cf1),
+        Symptom(name='تعفن بني على السيقان أو الثمار', cf=MATCH.cf2),
+        Symptom(name='ظهور زغب رمادي أو أبيض تحت الأوراق', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def late_blight_full(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: اللفحة المتأخرة (الطماطم) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="اللفحة المتأخرة"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع بنية مائية على حواف الأوراق', cf=MATCH.cf1),
+                Symptom(name='تعفن بني على السيقان أو الثمار', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='بقع بنية مائية على حواف الأوراق', cf=MATCH.cf1),
+                Symptom(name='ظهور زغب رمادي أو أبيض تحت الأوراق', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='تعفن بني على السيقان أو الثمار', cf=MATCH.cf1),
+                Symptom(name='ظهور زغب رمادي أو أبيض تحت الأوراق', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
+        )
+    )
+    def late_blight_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: اللفحة المتأخرة (الطماطم) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="اللفحة المتأخرة"))
+
+    @Rule(
+        OR(
+            Symptom(name='بقع بنية مائية على حواف الأوراق', cf=MATCH.cf1),
+            Symptom(name='تعفن بني على السيقان أو الثمار', cf=MATCH.cf1),
+            Symptom(name='ظهور زغب رمادي أو أبيض تحت الأوراق', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60),
+        salience=10,
+    )
+    def late_blight_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: اللفحة المتأخرة (الطماطم) (درجة الثقة: {final}/100)")
+        print("⚠️ يُنصح بإدخال المزيد من الأعراض لتأكيد التشخيص بسبب التشابه مع أعراض مرض آخر.")
+        self.declare(Fact(disease="اللفحة المتأخرة"))
+        self.halt()
+
+    @Rule(Fact(disease="اللفحة المتأخرة"))
+    def late_blight_treatment(self):
+        print("\n📌 المسبب: مرض اللفحة المتأخرة في الطماطم يُسببه الفطر Phytophthora infestans.")
+        print("\n💡 العلاج (اللفحة المتأخرة - الطماطم):")
+        print("- إزالة الأجزاء المصابة فورًا")
+        print("- رش مبيد فطري مثل Mancozeb أو Chlorothalonil")
+        print("- تكرار الرش كل 7 أيام في حال استمرار الظروف الرطبة")
+        print("- تجنب ري الأوراق مباشرة وتحسين التهوية بين النباتات")
+        self.halt()
+
+
+    #الذبول البكتيري
+    @Rule(
+        Symptom(name='ذبول مفاجئ دون اصفرار', cf=MATCH.cf1),
+        Symptom(name='لا يظهر تعفن على الساق', cf=MATCH.cf2),
+        Symptom(name='إفرازات مخاطية من قاعدة الساق', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def bacterial_wilt_full(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: الذبول البكتيري (الطماطم) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="الذبول البكتيري"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='ذبول مفاجئ دون اصفرار', cf=MATCH.cf1),
+                Symptom(name='لا يظهر تعفن على الساق', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='ذبول مفاجئ دون اصفرار', cf=MATCH.cf1),
+                Symptom(name='إفرازات مخاطية من قاعدة الساق', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='لا يظهر تعفن على الساق', cf=MATCH.cf1),
+                Symptom(name='إفرازات مخاطية من قاعدة الساق', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
+        )
+    )
+    def bacterial_wilt_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: الذبول البكتيري (الطماطم) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="الذبول البكتيري"))
+
+    @Rule(
+        OR(
+            Symptom(name='ذبول مفاجئ دون اصفرار', cf=MATCH.cf1),
+            Symptom(name='لا يظهر تعفن على الساق', cf=MATCH.cf1),
+            Symptom(name='إفرازات مخاطية من قاعدة الساق', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    )
+    def bacterial_wilt_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: الذبول البكتيري (الطماطم) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين دقة التشخيص.")
+        self.declare(Fact(disease="الذبول البكتيري"))
+
+    @Rule(Fact(disease="الذبول البكتيري"))
+    def bacterial_wilt_treatment(self):
+        print("\n📌 المسبب: مرض الذبول البكتيري في الطماطم يُسببه البكتيريا Ralstonia solanacearum.")
+        print("\n💡 العلاج (الذبول البكتيري - الطماطم):")
+        print("- إزالة النباتات المصابة فورًا لمنع الانتشار")
+        print("- تعقيم التربة وتجنب الزراعة في نفس المكان")
+        print("- زراعة أصناف مقاومة إن توفرت")
+        print("- تجنب الجروح أثناء الزراعة وتقليل الري الزائد")
+        self.halt()
+
+
+
+    #  تبقع الأوراق البكتيري
+    @Rule(
+        Symptom(name='بقع بنية مائية على الأوراق', cf=MATCH.cf1),
+        Symptom(name='تشقق الجلد على الثمار', cf=MATCH.cf2),
+        Symptom(name='تساقط الأوراق', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def bacterial_spot_full(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: تبقع الأوراق البكتيري (الطماطم) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="تبقع الأوراق البكتيري"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع بنية مائية على الأوراق', cf=MATCH.cf1),
+                Symptom(name='تشقق الجلد على الثمار', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='بقع بنية مائية على الأوراق', cf=MATCH.cf1),
+                Symptom(name='تساقط الأوراق', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='تشقق الجلد على الثمار', cf=MATCH.cf1),
+                Symptom(name='تساقط الأوراق', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
+        )
+    )
+    def bacterial_spot_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: تبقع الأوراق البكتيري (الطماطم) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="تبقع الأوراق البكتيري"))
+
+    @Rule(
+        OR(
+            Symptom(name='بقع بنية مائية على الأوراق', cf=MATCH.cf1),
+            Symptom(name='تشقق الجلد على الثمار', cf=MATCH.cf1),
+            Symptom(name='تساقط الأوراق', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    )
+    def bacterial_spot_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: تبقع الأوراق البكتيري (الطماطم) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="تبقع الأوراق البكتيري"))
+
+    @Rule(Fact(disease="تبقع الأوراق البكتيري"))
+    def bacterial_spot_treatment(self):
+        print("\n📌 المسبب: مرض تبقّع الأوراق البكتيري في الطماطم يُسببه البكتيريا Xanthomonas vesicatoria.")
+        print("\n💡 العلاج (تبقع الأوراق البكتيري - الطماطم):")
+        print("- إزالة الأوراق المصابة فورًا لمنع الانتشار")
+        print("- استخدام مبيدات نحاسية (Copper-based sprays) كل 7 أيام")
+        print("- تجنب رش المياه على الأوراق")
+        print("- زراعة أصناف مقاومة إن أمكن")
+        self.halt()
+
+
+    #  عفن الطرف الزهري
+    @Rule(
+        Symptom(name='بقعة سوداء غائرة في أسفل الثمرة', cf=MATCH.cf1),
+        Symptom(name='تصبح قاسية وجافة', cf=MATCH.cf2),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    )
+    def blossom_end_rot_full(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.85)
+        print(f"\n✅ التشخيص: عفن الطرف الزهري (الطماطم) – بسبب نقص الكالسيوم (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="عفن الطرف الزهري"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='بقعة سوداء غائرة في أسفل الثمرة', cf=MATCH.cf1),
+            Symptom(name='تصبح قاسية وجافة', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    )
+    def blossom_end_rot_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: عفن الطرف الزهري (الطماطم) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال العرض الثاني لتأكيد التشخيص.")
+        self.declare(Fact(disease="عفن الطرف الزهري"))
+
+    @Rule(Fact(disease="عفن الطرف الزهري"))
+    def blossom_end_rot_treatment(self):
+        print("\n📌 المسبب: مرض عفن الطرف الزهري في الطماطم يُسببه الفطر Botrytis cinerea.")
+        print("\n💡 العلاج (عفن الطرف الزهري - الطماطم):")
+        print("- إضافة مصدر كالسيوم إلى التربة (مثل نترات الكالسيوم)")
+        print("- الحفاظ على رطوبة منتظمة في التربة (تجنب الجفاف المفاجئ)")
+        print("- تجنب التسميد الزائد بالنيتروجين")
+        print("- رش ورقي بكالسيوم في حال النقص الحاد")
+        self.halt()
+
+
+
+
+    #  موزاييك الطماطم
+    @Rule(
+        Symptom(name='تبرقش في لون الأوراق (أخضر فاتح/غامق)', cf=MATCH.cf1),
+        Symptom(name='تشوه شكل الأوراق', cf=MATCH.cf2),
+        Symptom(name='صغر حجم الثمار', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    )
+    def tomato_mosaic_full(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: فيروس موزاييك الطماطم (ToMV) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="موزاييك الطماطم"))
+
+    @Rule(
+        OR(
+            AND(Symptom(name='تبرقش في لون الأوراق (أخضر فاتح/غامق)', cf=MATCH.cf1),
+                Symptom(name='تشوه شكل الأوراق', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='تبرقش في لون الأوراق (أخضر فاتح/غامق)', cf=MATCH.cf1),
+                Symptom(name='صغر حجم الثمار', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)),
+            AND(Symptom(name='تشوه شكل الأوراق', cf=MATCH.cf1),
+                Symptom(name='صغر حجم الثمار', cf=MATCH.cf2),
+                TEST(lambda cf1, cf2: min(cf1, cf2) >= 60))
+        )
+    )
+    def tomato_mosaic_partial(self, cf1=0, cf2=0):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️ تشخيص مبدئي: موزاييك الطماطم (ToMV) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="موزاييك الطماطم"))
+
+    @Rule(
+        OR(
+            Symptom(name='تبرقش في لون الأوراق (أخضر فاتح/غامق)', cf=MATCH.cf1),
+            Symptom(name='تشوه شكل الأوراق', cf=MATCH.cf1),
+            Symptom(name='صغر حجم الثمار', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    )
+    def tomato_mosaic_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: موزاييك الطماطم (ToMV) (درجة الثقة: {final}/100)")
+        print("⚠️ يُنصح بإدخال عرضين أو أكثر لتأكيد التشخيص.")
+        self.declare(Fact(disease="موزاييك الطماطم"))
+
+    @Rule(Fact(disease="موزاييك الطماطم"))
+    def tomato_mosaic_treatment(self):
+        print("\n📌 المسبب: فيروس موزاييك الطماطم (Tomato Mosaic Virus) - ToMV")
+        print("\n💡 العلاج (موزاييك الطماطم - ToMV):")
+        print("- لا يوجد علاج مباشر، يُنصح بإزالة النباتات المصابة")
+        print("- استخدام بذور مقاومة للفيروس عند الزراعة")
+        print("- تعقيم الأدوات وتجنب ملامسة النباتات بأيدي ملوثة")
+        print("- مكافحة الحشرات الناقلة مثل المنّ")
+        self.halt()
+</file>
+
+<file path="zucchini_rules.py">
+from experta import Rule, Fact, MATCH, TEST, OR, AND
+from core import Symptom, PlantDiagnosisEngine
+
+class ZucchiniRules(PlantDiagnosisEngine):
+
+    #فيروس موزاييك الكوسا
+    @Rule(
+        Symptom(name='فسيفساء (mosaic) وتبقع أصفر على الأوراق', cf=MATCH.cf1),
+        Symptom(name='تشوه وتقزز أوراق الكوسا', cf=MATCH.cf2),
+        Symptom(name='ثمار مشوّهة أو ملوّنة وغير منتظمة', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def zymv_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: فيروس موزاييك الكوسا الأصفر (ZYMV) (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="ZYMV"))
+
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='فسيفساء (mosaic) وتبقع أصفر على الأوراق', cf=MATCH.cf1),
+                Symptom(name='تشوه وتقزز أوراق الكوسا', cf=MATCH.cf2)),
+            AND(Symptom(name='فسيفساء (mosaic) وتبقع أصفر على الأوراق', cf=MATCH.cf1),
+                Symptom(name='ثمار مشوّهة أو ملوّنة وغير منتظمة', cf=MATCH.cf2)),
+            AND(Symptom(name='تشوه وتقزز أوراق الكوسا', cf=MATCH.cf1),
+                Symptom(name='ثمار مشوّهة أو ملوّنة وغير منتظمة', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
+    )
+    def zymv_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: فيروس موزاييك الكوسا الأصفر (ZYMV) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="ZYMV"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='فسيفساء (mosaic) وتبقع أصفر على الأوراق', cf=MATCH.cf1),
+            Symptom(name='تشوه وتقزز أوراق الكوسا', cf=MATCH.cf1),
+            Symptom(name='ثمار مشوّهة أو ملوّنة وغير منتظمة', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def zymv_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: فيروس موزاييك الكوسا الأصفر (ZYMV) (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="ZYMV"))
+
+
+    @Rule(Fact(disease="ZYMV"), salience=5)
+    def zymv_treatment(self):
+        print("\n📌 المسبب: فيروس موزاييك الكوسا (Zucchini Yellow Mosaic Virus) - ZYMV")
+        print("\n💡 العلاج (فيروس موزاييك الكوسا الأصفر - ZYMV):")
+        print("- إزالة وإتلاف النباتات المصابة فورًا.")
+        print("- مكافحة الحشرات الناقلة (خاصة المن) بمبيدات حشرية.")
+        print("- استخدام أصناف مقاومة أو مطعّمة.")
+        print("- تجنب زراعة الكوسا بالقرب من المحاصيل المصابة.")
+        print("- استخدام بذور خالية من الفيروس.")
+        self.halt()
+
+
+
+
+    #البياض البودري
+
+    @Rule(
+        Symptom(name='مسحوق أبيض رمادي يغطي السطح العلوي أو السفلي للأوراق', cf=MATCH.cf1),
+        Symptom(name='اصفرار وتجعيد الأوراق مسبقًا', cf=MATCH.cf2),
+        Symptom(name='تباطؤ نمو النبات وجفاف الأوراق المتقدمة', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def powdery_mildew_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض البياض البودري (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="البياض البودري"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='مسحوق أبيض رمادي يغطي السطح العلوي أو السفلي للأوراق', cf=MATCH.cf1),
+                Symptom(name='اصفرار وتجعيد الأوراق مسبقًا', cf=MATCH.cf2)),
+            AND(Symptom(name='مسحوق أبيض رمادي يغطي السطح العلوي أو السفلي للأوراق', cf=MATCH.cf1),
+                Symptom(name='تباطؤ نمو النبات وجفاف الأوراق المتقدمة', cf=MATCH.cf2)),
+            AND(Symptom(name='اصفرار وتجعيد الأوراق مسبقًا', cf=MATCH.cf1),
+                Symptom(name='تباطؤ نمو النبات وجفاف الأوراق المتقدمة', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
+    )
+    def powdery_mildew_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض البياض البودري (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="البياض البودري"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='مسحوق أبيض رمادي يغطي السطح العلوي أو السفلي للأوراق', cf=MATCH.cf1),
+            Symptom(name='اصفرار وتجعيد الأوراق مسبقًا', cf=MATCH.cf1),
+            Symptom(name='تباطؤ نمو النبات وجفاف الأوراق المتقدمة', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def powdery_mildew_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض البياض البودري (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="البياض البودري"))
+
+
+    @Rule(Fact(disease="البياض البودري"), salience=5)
+    def powdery_mildew_treatment(self):
+        print("\n📌 المسبب: مرض البياض البودري في الكوسا يُسببه الفطر Podosphaera xanthii.")
+        print("\n💡 العلاج (مرض البياض البودري):")
+        print("- رش النبات بمبيد فطري مخصص للبياض البودري (مثل الكبريت الميكروني أو محلول بوردو).")
+        print("- تحسين التهوية وتقليل الرطوبة داخل البيوت المحمية.")
+        print("- إزالة الأوراق المصابة فورًا ومنع تراكم بقايا النباتات.")
+        print("- تجنب الري بالرش ويفضل الري الجذري.")
+        print("- زراعة أصناف مقاومة للمرض.")
+        self.halt()
+
+
+
+
+    #الذبول البكتيري
+    @Rule(
+        Symptom(name='ذبول فوري للنبات بدون اصفرار سابق', cf=MATCH.cf1),
+        Symptom(name='أوراق قد تتحوّل إلى لون أخضر داكن ممل أو باهت', cf=MATCH.cf2),
+        Symptom(name='سوائل مخاطية على جذع النبات عند القطع', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def bacterial_wilt_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض الذبول البكتيري (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="الذبول البكتيري"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='ذبول فوري للنبات بدون اصفرار سابق', cf=MATCH.cf1),
+                Symptom(name='أوراق قد تتحوّل إلى لون أخضر داكن ممل أو باهت', cf=MATCH.cf2)),
+            AND(Symptom(name='ذبول فوري للنبات بدون اصفرار سابق', cf=MATCH.cf1),
+                Symptom(name='سوائل مخاطية على جذع النبات عند القطع', cf=MATCH.cf2)),
+            AND(Symptom(name='أوراق قد تتحوّل إلى لون أخضر داكن ممل أو باهت', cf=MATCH.cf1),
+                Symptom(name='سوائل مخاطية على جذع النبات عند القطع', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
+    )
+    def bacterial_wilt_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض الذبول البكتيري (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="الذبول البكتيري"))
+
+
+
+    @Rule(
+        OR(
+            Symptom(name='ذبول فوري للنبات بدون اصفرار سابق', cf=MATCH.cf1),
+            Symptom(name='أوراق قد تتحوّل إلى لون أخضر داكن ممل أو باهت', cf=MATCH.cf1),
+            Symptom(name='سوائل مخاطية على جذع النبات عند القطع', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def bacterial_wilt_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض الذبول البكتيري (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="الذبول البكتيري"))
+
+
+    @Rule(Fact(disease="الذبول البكتيري"), salience=5)
+    def zucchini_bacterial_wilt_treatment(self):
+        print(
+            "\n📌 المسبب: مرض الذبول البكتيري في الكوسا يُسببه البكتيريا Erwinia tracheiphila")
+        print("\n💡 العلاج (مرض الذبول البكتيري):")
+        print("- إزالة النباتات المصابة فورًا والتخلص منها (لا تُعيد استخدامها كسماد).")
+        print("- تعقيم أدوات الزراعة بعد كل استخدام.")
+        print("- مكافحة الخنافس (خاصة خنفساء الخيار) الناقلة للبكتيريا باستخدام مبيدات حشرية.")
+        print("- تجنب زراعة الكوسا في نفس التربة التي سبق إصابة نباتات فيها بالمرض.")
+        print("- لا توجد علاج كيميائي فعّال، لذا يُركز على الوقاية فقط.")
+        self.halt()
+
+
+
+    #عفن الجذع اللزج
+
+    @Rule(
+        Symptom(name='بقع دائرية مائية على الأوراق', cf=MATCH.cf1),
+        Symptom(name='تقرحات وسوائل بنية/لزجة تنطلق من الساق', cf=MATCH.cf2),
+        Symptom(name='تعفن الثمار أو صدأ على الثمار', cf=MATCH.cf3),
+        TEST(lambda cf1, cf2, cf3: min(cf1, cf2, cf3) >= 60)
+    ,
+        salience=30
+    )
+    def gummy_stem_blight_full_3(self, cf1, cf2, cf3):
+        final = round(min(cf1, cf2, cf3) * 0.85)
+        print(f"\n✅ التشخيص: مرض عفن الجذع اللزج (درجة الثقة: {final}/100)")
+        self.declare(Fact(disease="عفن الجذع اللزج"))
+
+
+    @Rule(
+        OR(
+            AND(Symptom(name='بقع دائرية مائية على الأوراق', cf=MATCH.cf1),
+                Symptom(name='تقرحات وسوائل بنية/لزجة تنطلق من الساق', cf=MATCH.cf2)),
+            AND(Symptom(name='بقع دائرية مائية على الأوراق', cf=MATCH.cf1),
+                Symptom(name='تعفن الثمار أو صدأ على الثمار', cf=MATCH.cf2)),
+            AND(Symptom(name='تقرحات وسوائل بنية/لزجة تنطلق من الساق', cf=MATCH.cf1),
+                Symptom(name='تعفن الثمار أو صدأ على الثمار', cf=MATCH.cf2))
+        ),
+        TEST(lambda cf1, cf2: min(cf1, cf2) >= 60)
+    ,
+        salience=20
+    )
+    def gummy_stem_blight_partial_strong(self, cf1, cf2):
+        final = round(min(cf1, cf2) * 0.65)
+        print(f"\n⚠️  تشخيص مبدئي: مرض عفن الجذع اللزج (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتأكيد التشخيص.")
+        self.declare(Fact(disease="عفن الجذع اللزج"))
+
+
+    @Rule(
+        OR(
+            Symptom(name='بقع دائرية مائية على الأوراق', cf=MATCH.cf1),
+            Symptom(name='تقرحات وسوائل بنية/لزجة تنطلق من الساق', cf=MATCH.cf1),
+            Symptom(name='تعفن الثمار أو صدأ على الثمار', cf=MATCH.cf1)
+        ),
+        TEST(lambda cf1: cf1 >= 60)
+    ,
+        salience=10
+    )
+    def gummy_stem_blight_weak(self, cf1):
+        final = round(cf1 * 0.45)
+        print(f"\n❗ احتمال ضعيف: مرض عفن الجذع اللزج (درجة الثقة: {final}/100)")
+        print("⚠️ يُفضل إدخال المزيد من الأعراض لتحسين التشخيص.")
+        self.declare(Fact(disease="عفن الجذع اللزج"))
+
+
+    @Rule(Fact(disease="عفن الجذع اللزج"), salience=5)
+    def gummy_stem_blight_treatment(self):
+        print("\n📌 المسبب: مرض عفن الجذع اللزج في الكوسا يُسببه البكتيريا Pectobacterium carotovorum")
+        print("\n💡 العلاج (مرض عفن الجذع اللزج):")
+        print("- رش النبات بمبيد فطري وقائي مثل مبيدات النحاس أو البنزيميدازول.")
+        print("- إزالة وإتلاف الأجزاء المصابة فورًا.")
+        print("- تجنب الري بالرش لتفادي زيادة الرطوبة والانتشار.")
+        print("- تعقيم أدوات العمل بين النباتات.")
+        print("- تجنب الزراعة الكثيفة وتحسين التهوية بين النباتات.")
+        self.halt()
+</file>
+
+</files>
