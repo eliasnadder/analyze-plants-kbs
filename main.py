@@ -1,240 +1,168 @@
+import sys
 import collections
 import collections.abc
-collections.Mapping = collections.abc.Mapping
 
-from experta import *
-from cherry_rules import CherryRules
-from apple_rules import AppleRules
-from grape_rules import GrapeRules
-from tomato_rules import TomatoRules
-from core import Symptom
-from Potato_rules import PotatoRules
-from citrus_rules import CitrusRules
+try:
+    collections.Mapping  # noqa: B018
+except AttributeError:
+    collections.Mapping = collections.abc.Mapping
+
+from apple_rules    import AppleRules
+from cherry_rules   import CherryRules
+from grape_rules    import GrapeRules
+from tomato_rules   import TomatoRules
+from Potato_rules   import PotatoRules
+from citrus_rules   import CitrusRules
 from zucchini_rules import ZucchiniRules
 from eggplant_rules import EggplantRules
-from onion_rules import OnionRules
-from garlic_rules import GarlicRules
+from onion_rules    import OnionRules
+from garlic_rules   import GarlicRules
+from core           import Symptom
+from symptom_mapper import map_text_to_symptoms
 
-# ✅ اختيار النظام المناسب حسب النبات
-engines = {
-    1: ("تفاح", AppleRules),
-    2: ("كرز", CherryRules),
-    3: ("عنب", GrapeRules),
-    4: ("طماطم", TomatoRules),
-    5: ("بطاطا", PotatoRules),
-    6: ("حمضيات", CitrusRules),
-    7: ("كوسا", ZucchiniRules),
-    8: ("باذنجان", EggplantRules),
-    9: ("البصل", OnionRules),
-    10: ("الثوم", GarlicRules),
+# ── تسجيل المحركات ────────────────────────────────────────────────────────
+ENGINES: dict[int, tuple[str, type]] = {
+    1:  ("تفاح",    AppleRules),
+    2:  ("كرز",     CherryRules),
+    3:  ("عنب",     GrapeRules),
+    4:  ("طماطم",   TomatoRules),
+    5:  ("بطاطا",   PotatoRules),
+    6:  ("حمضيات",  CitrusRules),
+    7:  ("كوسا",    ZucchiniRules),
+    8:  ("باذنجان", EggplantRules),
+    9:  ("البصل",   OnionRules),
+    10: ("الثوم",   GarlicRules),
 }
+EXIT_CHOICE = len(ENGINES) + 1
 
-# جميع الأعراض حسب النبات المختار
-symptoms_by_crop = {
-    "تفاح": [
-        "بقع زيتية على الأوراق",
-        "تشوه الثمار",
-        "تقشر لون الأوراق",
-        "بقع بنفسجية على الأوراق",
-        "تقرحات على الأغصان",
-        "تعفن بني على الثمار",
-        "بقع صفراء على الأوراق",
-        "أورام برتقالية",
-        "تورم الأوراق من الأسفل"
-    ],
-    "كرز": [
-        "بقع بيضاء على سطح الأوراق",
-        "تشوه الأوراق",
-        "تبقع وتلف الثمار",
-        "بقع أرجوانية أو حمراء على الأوراق",
-        "ثقوب دائرية في الأوراق",
-        "بقع داكنة على الثمار",
-        "بقع بنية طرية على الثمار",
-        "ظهور دوائر بيضاء من الأبواغ",
-        "تعفن الثمار وتساقطها",
-        "تقرحات غائرة على الساق أو الأغصان",
-        "تسرب صمغ من أماكن التقرحات",
-        "ذبول مفاجئ للأوراق أو الأغصان"
-    ],
-    "عنب": [
-        "بقع صفراء على الأوراق",
-        "نمو أبيض قطني تحت الأوراق",
-        "ذبول الأوراق وسقوطها",
-        "بقع رمادية على العناقيد",
-        "تعفن طري على الثمار",
-        "وجود زغب رمادي اللون",
-        "مسحوق أبيض على سطح الأوراق والثمار",
-        "تشوه الثمار وتوقف نموها",
-        "تشقق الثمار وتلفها",
-        "توقف نمو النبات أو موته المفاجئ"
-    ],
-    "طماطم": [
-        "هالات صفراء حول البقع",
-        "ذبول الأوراق السفلية",
-        "بقع بنية مائية على حواف الأوراق",
-        "تعفن بني على السيقان أو الثمار",
-        "ظهور زغب رمادي أو أبيض تحت الأوراق",
-        "ذبول مفاجئ دون اصفرار",
-        "لا يظهر تعفن على الساق",
-        "إفرازات مخاطية من قاعدة الساق",
-        "بقع بنية مائية على الأوراق",
-        "تشقق الجلد على الثمار",
-        "تساقط الأوراق",
-        "بقعة سوداء غائرة في أسفل الثمرة",
-        "تصبح قاسية وجافة",
-        "تبرقش في لون الأوراق (أخضر فاتح/غامق)",
-        "تشوه شكل الأوراق",
-        "صغر حجم الثمار"
-    ],
-    "بطاطا": [
-        "بقع مائية داكنة على الأوراق",
-        "هالات خضراء إلى بنية على الساق",
-        "تعفن بني على الدرنات",
-        "ورقة ناصعة اللون أو موزاييك مصفر",
-        "تشوه أو تجعد الأوراق",
-        "بقع سوداء صلبة على الدرنات",
-        "آفات في الساق عند القاعدة",
-        "ظهور بثور صغيرة بيضاء أو بنية على الدرنات",
-        "تشوه سطح الدرنات",
-        "تندّب أو تقشير جلدي في منطقة القروح"
-    ],
-    "حمضيات": [
-        "اصفرار وتمدد للأوراق والشعيرات الخشبية",
-        "ذبول وفناء أجزاء من الفروع",
-        "إفرازات صمغية وردية أو رمادية في الجذوع",
-        "بقع داكنة أو تكاثف للنسيج الخشبي تحت اللحاء",
-        "إفرازات صمغية سوداء أو بنية عند قاعدة الجذع",
-        "تقرحات أو تصدعات في اللحاء بالقرب من سطح التربة",
-        "ذبول الأصناف وضعف نمو الأورقات",
-        "اختناق النسيج الوعائي وموت الفروع",
-        "تجعد أو تساقط الأوراق",
-        "ضعف في النمو، وقلة الإنتاجية",
-        "بقع داكنة غائرة على الثمار",
-        "تساقط مبكر للثمار",
-        "بقع صغيرة على الأوراق في بعض الحالات",
-        "تقرحات مائية على الأوراق والسيقان والثمار",
-        "يحيط بها هالة صفراء",
-        "بقع صفراء-بنية لامعة على السطح السفلي للأوراق"
-    ],
-    "كوسا": [
-        "فسيفساء (mosaic) وتبقع أصفر على الأوراق",
-        "تشوه وتقزز أوراق الكوسا",
-        "ثمار مشوّهة أو ملوّنة وغير منتظمة",
-        "مسحوق أبيض رمادي يغطي السطح العلوي أو السفلي للأوراق",
-        "اصفرار وتجعيد الأوراق مسبقًا",
-        "تباطؤ نمو النبات وجفاف الأوراق المتقدمة",
-        "ذبول فوري للنبات بدون اصفرار سابق",
-        "أوراق قد تتحوّل إلى لون أخضر داكن ممل أو باهت",
-        "سوائل مخاطية على جذع النبات عند القطع",
-        "بقع دائرية مائية على الأوراق",
-        "تقرحات وسوائل بنية/لزجة تنطلق من الساق",
-        "تعفن الثمار أو صدأ على الثمار"
-    ],
-    "باذنجان": [
-        "ذبول مفاجئ للنبات بدون اصفرار سابق",
-        "تحول الساق الداخلي إلى اللون البني – يظهر عند قطع الجذع انسياب سائل مخاطي",
-        "موت النبات بالكامل، خصوصًا في الطقس الدافئ والرطب",
-        "اصفرار الأوراق السفلية تدريجيًا، ثم ذبولها",
-        "تظهر بقع بنية على الأوعية الوعائية داخل الساق عند تقطيعها",
-        "ضعف النمو وتراجع إنتاج الثمار",
-        "بقع بنية مائية على الثمار، خاصة في النبات السفلي",
-        "تعفن الساقين عند قاعدة النبات، مع ظهور طبقة بيضاء زغبية",
-        "بقع دائرية داكنة على الأوراق، غالبًا محاطة بهالة صفراء",
-        'انثقاب البقع وتحولها إلى "ثقوب" عند تقدم الإصابة',
-        "تساقط الأوراق وضعف التمثيل الضوئي",
-        "إعوجاجات وتفحم في قاعدة الساق عند سطح التربة",
-        'ظهور شبكة من الفطريات البيضاء وثم "جذور سوداء" (sclerotia)',
-        "ذبول وموت مفاجئ للنبات حتى في الطقس المعتدل"
-    ],
-    "البصل": [
-        "بقع صفراء باهتة أو بنية طويلة على الأوراق الخارجية قد تتحول إلى نمو رمادي-بنفسجي تحت الرطوبة",
-        "ذبول الأوراق المصابة وانحناؤها أو تساقطها",
-        "البصليات تصبح طرية ومائية بسبب المرض",
-        "بقعة مائية صغيرة تتحول إلى بقعة داكنة ذات هالة صفراء",
-        "تظهر بقعة هدف بنية-أرجوانية على الأوراق",
-        "انتشار البقع وقت المطر أو الرذاذ",
-        "طرى ورخاوة في قاعدة رقبة البصلة (الياقة)",
-        "ظهور نمو فطري رمادي أو زغب أسود على الياقة أو بين القشور",
-        "تعفن البصلة من الأعلى باتجاه الداخل أثناء التخزين",
-        "جذور مصابة تصبح وردية أولاً، ثم تتحول إلى حمراء أو أرجوانية",
-        "الجذور تصبح مائية وقابلة للتفتت",
-        "ضعف نمو النبات وجفافه حتى قبل إنضاج البصلية",
-        "تضخم في الجذوع السفلية وتعفن جزئي",
-        "أوراق ملتفة، صفراء وسريعة الذبول",
-        "البصليات مشوهة أو ناعمة، غير قابلة للبيع"
-    ],
-    "الثوم": [
-        "اصفرار الأوراق من الأطراف نحو القاعدة",
-        "ظهور نمو رمادي مزرق على السطح السفلي للأوراق",
-        "تدهور مبكر للنباتات وسقوط الأوراق",
-        "رقّة قاعدة الساق (العنق) وتلونها بلون بني رمادي",
-        "ظهور زغب رمادي على العنق أثناء التخزين",
-        "تفكك أنسجة العنق وتعفن البصلة من الأعلى",
-        "بقع مائية على البصلة تبدأ من الجروح",
-        "نمو فطري أزرق مخضر على سطح البصلة",
-        "رائحة عفن نفاذة عند شق البصلة",
-        "اصفرار الأوراق وذبول مفاجئ للنبات",
-        "نمو أبيض قطني كثيف على قاعدة النبات",
-        "ظهور أجسام سوداء صغيرة (سكليروشيا) في التربة حول الجذور",
-        "تبرقش أصفر أو أخضر فاتح على الأوراق الطرية",
-        "تقزم النبات وضعف في تكوين الأبصال",
-        "تشوه في شكل الأوراق وتأخر في النمو"
-    ]
-}
 
-if __name__ == "__main__":
-    while True:
-        print("\n🌿 اختر نوع النبات:")
-        for key, (name, _) in engines.items():
-            print(f"{key}. {name}")
-        print(f"{len(engines) + 1}. إنهاء البرنامج")
+# ── اختيار المحصول ─────────────────────────────────────────────────────────
+def _select_crop() -> tuple[str, type] | None:
+    print("\n🌿 اختر نوع النبات:")
+    for key, (name, _) in ENGINES.items():
+        print(f"  {key}. {name}")
+    print(f"  {EXIT_CHOICE}. خروج")
 
-        try:
-            crop_choice = int(input("\n🔢 أدخل رقم النبات: "))
-        except ValueError:
-            print("❌ إدخال غير صالح. يرجى إدخال رقم.")
+    raw = input("> ").strip()
+    if not raw.isdigit():
+        print("⚠️  أدخل رقماً من القائمة.")
+        return None
+
+    idx = int(raw)
+    if idx == EXIT_CHOICE:
+        return ()
+    if idx not in ENGINES:
+        print("⚠️  رقم غير موجود.")
+        return None
+    return ENGINES[idx]
+
+
+# ── الإدخال اليدوي (قائمة) ────────────────────────────────────────────────
+def _collect_manual_symptoms(engine_class: type, crop_name: str) -> list:
+    symptoms = engine_class.SYMPTOMS
+    print(f"\n📋 أعراض {crop_name} المتاحة:")
+    for i, sym in enumerate(symptoms, start=1):
+        print(f"  {i:2}. {sym}")
+
+    raw = input("\nأدخل أرقام الأعراض (مفصولة بمسافات): ").strip()
+    if not any(t.isdigit() for t in raw.split()):
+        print("⚠️  يرجى إدخال أرقام (مثال: 1 3 7).")
+        return []
+
+    selected = []
+    for token in raw.split():
+        if not token.isdigit():
             continue
+        idx = int(token) - 1
+        if not (0 <= idx < len(symptoms)):
+            print(f"  ⚠️  الرقم {token} خارج النطاق، تم تجاهله.")
+            continue
+        try:
+            cf = int(input(f"  درجة التأكد (0–100) لـ '{symptoms[idx]}': ").strip())
+            cf = max(0, min(100, cf))
+            selected.append(Symptom(name=symptoms[idx], cf=cf))
+        except ValueError:
+            print("  ⚠️  إدخال غير صالح، تم تجاهل هذا العرض.")
+    return selected
 
-        if crop_choice == len(engines) + 1:
-            print("👋 تم إنهاء البرنامج.")
+
+# ── الإدخال النصي (NLP) ───────────────────────────────────────────────────
+def _collect_nlp_symptoms(engine_class: type, crop_name: str) -> list:
+    print(f"\n✍️  صِف لي الأعراض التي تلاحظها على {crop_name}:")
+    print("    (مثال: الأوراق صفراء وعم تتساقط، في تورم من الأسفل)")
+    user_text = input("> ").strip()
+
+    if not user_text:
+        print("⚠️  لم تكتب شيئاً.")
+        return []
+
+    # ✅ التصحيح الرئيسي: نمرر قائمة أعراض المحصول الحالي كفلتر
+    detected = map_text_to_symptoms(user_text, crop_symptoms=engine_class.SYMPTOMS)
+
+    if not detected:
+        print("⚠️  لم أستطع استخراج أعراض واضحة من نصك.")
+        print("    جرّب الإدخال اليدوي، أو أعِد صياغة الجملة بشكل أوضح.")
+        return []
+
+    print(f"\n✅ تم اكتشاف {len(detected)} عرض:")
+    selected = []
+    for name in detected:
+        print(f"  - {name}")
+        try:
+            cf_raw = input(f"    درجة تأكدك (0–100)؟ [اضغط Enter للافتراض 80]: ").strip()
+            cf = int(cf_raw) if cf_raw else 80
+            cf = max(0, min(100, cf))
+        except ValueError:
+            cf = 80
+            print("    ⚠️  إدخال غير صالح، تم افتراض 80.")
+        selected.append(Symptom(name=name, cf=cf))
+
+    return selected
+
+
+# ── الحلقة الرئيسية ───────────────────────────────────────────────────────
+def main() -> None:
+    print("=" * 50)
+    print("  🌱 نظام تشخيص الأمراض النباتية")
+    print("=" * 50)
+
+    while True:
+        result = _select_crop()
+        if result is None:
+            continue
+        if result == ():
+            print("👋 مع السلامة.")
             break
 
-        if crop_choice not in engines:
-            print("❌ رقم غير صالح. حاول مرة أخرى.")
-            continue
+        crop_name, engine_class = result
 
-        crop_name, EngineClass = engines[crop_choice]
-        engine = EngineClass()
+        print(f"\nطريقة إدخال الأعراض لـ [{crop_name}]:")
+        print("  1. إدخال نصي حر (NLP) — اكتب ما تراه بكلامك")
+        print("  2. اختيار يدوي من القائمة")
+        mode = input("> ").strip()
+
+        engine = engine_class()
         engine.reset()
 
-        symptoms = symptoms_by_crop[crop_name]
+        if mode == "1":
+            facts = _collect_nlp_symptoms(engine_class, crop_name)
+        else:
+            facts = _collect_manual_symptoms(engine_class, crop_name)
 
-        print(f"\n🔍 اختر الأعراض التي تلاحظها على {crop_name} من القائمة التالية:")
-        for i, symptom in enumerate(symptoms):
-            print(f"{i + 1}. {symptom}")
+        if not facts:
+            print("  لم تُدخل أي أعراض، تم تجاهل التشخيص.")
+        else:
+            print("\n" + "─" * 40)
+            for fact in facts:
+                engine.declare(fact)
+            engine.run()
+            print("─" * 40)
 
-        selected_indices = input("\n📌 أدخل أرقام الأعراض الموجودة (مفصولة بفاصلة): ")
-        indices = [int(i.strip()) - 1 for i in selected_indices.split(',') if
-                   i.strip().isdigit() and 0 < int(i.strip()) <= len(symptoms)]
+        again = input("\nهل تريد تشخيص مرض آخر؟ (نعم/لا): ").strip().lower()
+        if again not in ("نعم", "yes", "y"):
+            print("👋 مع السلامة.")
+            break
 
-        for idx in indices:
-            try:
-                cf = int(input(f"📈 أدخل درجة التأكد (0-100) لعرض '{symptoms[idx]}': "))
-                if 0 <= cf <= 100:
-                    engine.declare(Symptom(name=symptoms[idx], cf=cf))
-            except:
-                print("⚠️ إدخال غير صالح، تم تجاهل العرض.")
 
-        engine.run()
-
-        # سؤال المستخدم بعد التشخيص
-        while True:
-            choice = input("\n🔁 هل تريد تشخيص مرض آخر؟ (نعم / لا): ").strip().lower()
-            if choice in ['لا', 'no', 'n']:
-                print("👋 تم إنهاء البرنامج.")
-                exit()
-            elif choice in ['نعم', 'yes', 'y']:
-                print("🔄 إعادة التشخيص...")
-                break
-            else:
-                print("❌ الرد غير مفهوم. يرجى الإجابة بـ 'نعم' أو 'لا'.")
+if __name__ == "__main__":
+    main()
