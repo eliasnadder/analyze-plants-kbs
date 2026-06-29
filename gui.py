@@ -12,13 +12,14 @@ except AttributeError:
 
 import io
 import re
+from datetime import datetime
 from contextlib import redirect_stdout
 
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QTabWidget, QTextEdit, QPushButton,
     QListWidget, QListWidgetItem, QMessageBox, QFrame,
-    QSizePolicy, QScrollArea,
+    QSizePolicy, QScrollArea, QSlider,
 )
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QFont, QTextCharFormat, QColor, QTextCursor
@@ -283,6 +284,25 @@ QTextEdit#output {{
     selection-background-color: #2a2a45;
 }}
 
+/* ═══ سجل التشخيصات ═══ */
+QListWidget#hist_list {{
+    background: {C['bg']};
+    border: 1.5px solid {C['border']};
+    border-radius: 10px;
+    padding: 4px;
+    outline: none;
+    font-size: 12px;
+    color: {C['text']};
+}}
+QListWidget#hist_list::item {{
+    padding: 7px 10px;
+    border-radius: 6px;
+    margin: 1px 2px;
+}}
+QListWidget#hist_list::item:hover {{
+    background: {C['green_light']};
+}}
+
 /* ═══ شرائح الأعراض ═══ */
 QLabel#chip {{
     background: {C['green_light']};
@@ -343,6 +363,8 @@ class PlantDiseaseGUI(QMainWindow):
         self.resize(1120, 740)
         self.setLayoutDirection(Qt.RightToLeft)
         self.setStyleSheet(STYLESHEET)
+
+        self.history = []
 
         root = QWidget()
         root.setObjectName("root")
@@ -505,6 +527,35 @@ class PlantDiseaseGUI(QMainWindow):
         )
         v.addWidget(self.output, 1)
 
+        # ─ سجل التشخيصات ─
+        hist_header = QHBoxLayout()
+        hist_header.setSpacing(10)
+
+        hist_lbl = QLabel("📜 سجل التشخيصات")
+        hist_lbl.setObjectName("card_title")
+        hist_header.addWidget(hist_lbl)
+
+        self.history_toggle_btn = QPushButton("عرض")
+        self.history_toggle_btn.setObjectName("btn_chip")
+        self.history_toggle_btn.setCursor(Qt.PointingHandCursor)
+        self.history_toggle_btn.clicked.connect(self._toggle_history)
+        hist_header.addWidget(self.history_toggle_btn)
+
+        self.history_count_lbl = QLabel("0 تشخيص")
+        self.history_count_lbl.setObjectName("hint")
+        hist_header.addWidget(self.history_count_lbl)
+
+        hist_header.addStretch()
+        v.addLayout(hist_header)
+
+        self.history_list = QListWidget()
+        self.history_list.setObjectName("hist_list")
+        self.history_list.setFixedHeight(120)
+        self.history_list.setVisible(False)
+        self.history_list.setFocusPolicy(Qt.NoFocus)
+        self.history_list.clicked.connect(self._show_history_item)
+        v.addWidget(self.history_list)
+
         return w
 
     # ─────────────────────── بطاقة الإدخال ─────────────────────────────────
@@ -595,6 +646,48 @@ class PlantDiseaseGUI(QMainWindow):
         self.sym_list.setSelectionMode(QListWidget.NoSelection)
         self.sym_list.setFixedHeight(118)
         tm.addWidget(self.sym_list)
+
+        # ─ شريط عامل الثقة (CF) ─
+        cf_row = QHBoxLayout()
+        cf_row.setSpacing(8)
+        cf_label = QLabel("عامل الثقة (CF):")
+        cf_label.setObjectName("hint")
+        cf_row.addWidget(cf_label)
+
+        self.cf_slider = QSlider(Qt.Horizontal)
+        self.cf_slider.setObjectName("cf_slider")
+        self.cf_slider.setRange(0, 100)
+        self.cf_slider.setValue(100)
+        self.cf_slider.setFixedHeight(22)
+        self.cf_slider.setStyleSheet(f"""
+            QSlider#cf_slider::groove:horizontal {{
+                background: {C['border']};
+                height: 6px;
+                border-radius: 3px;
+            }}
+            QSlider#cf_slider::handle:horizontal {{
+                background: {C['green']};
+                width: 16px;
+                height: 16px;
+                margin: -5px 0;
+                border-radius: 8px;
+            }}
+            QSlider#cf_slider::sub-page:horizontal {{
+                background: {C['green']};
+                border-radius: 3px;
+            }}
+        """)
+        cf_row.addWidget(self.cf_slider, 1)
+
+        self.cf_value_lbl = QLabel("100")
+        self.cf_value_lbl.setObjectName("hint")
+        self.cf_value_lbl.setFixedWidth(30)
+        self.cf_slider.valueChanged.connect(
+            lambda v: self.cf_value_lbl.setText(str(v))
+        )
+        cf_row.addWidget(self.cf_value_lbl)
+
+        tm.addLayout(cf_row)
 
         self.tabs.addTab(tab_nlp, "🤖  التحليل الذكي")
         self.tabs.addTab(tab_manual, "📋  الاختيار اليدوي")
@@ -774,7 +867,7 @@ class PlantDiseaseGUI(QMainWindow):
         for i in range(self.sym_list.count()):
             item = self.sym_list.item(i)
             if item.checkState() == Qt.Checked:
-                selected.append(Symptom(name=item.text().strip(), cf=100))
+                selected.append(Symptom(name=item.text().strip(), cf=self.cf_slider.value()))
 
         if not selected:
             QMessageBox.warning(self, "تنبيه", "حدّد عرضاً واحداً على الأقل.")
@@ -790,7 +883,7 @@ class PlantDiseaseGUI(QMainWindow):
             raw=raw,
         )
         self.lbl_status.setText(
-            f"✅ {len(selected)} أعراض يدوية  ·  {name}  ·  CF = 100"
+            f"✅ {len(selected)} أعراض يدوية  ·  {name}  ·  CF = {self.cf_slider.value()}"
         )
 
     # ─────────────────────── تنسيق الإخراج ─────────────────────────────────
@@ -832,8 +925,9 @@ class PlantDiseaseGUI(QMainWindow):
             cur.insertText(text + ("\n" if nl else ""))
 
         # رأس الجلسة
+        crop_emoji = CROP_EMOJIS.get(crop, "🌱")
         _w("─" * 48, color=C["out_dim"])
-        _w(f"  🌿  المحصول   :  {crop}", color=C["out_blue"], bold=True)
+        _w(f"  {crop_emoji}  المحصول   :  {crop}", color=C["out_blue"], bold=True)
         _w(f"  📥  الإدخال   :  {mode}", color=C["out_dim"])
         if extra:
             _w(f"  📝  {extra}", color=C["out_dim"])
@@ -849,6 +943,7 @@ class PlantDiseaseGUI(QMainWindow):
         _w("")
 
         # تلوين سطر المخرجات
+        in_treatment = False
         for line in raw.split("\n"):
             stripped = line.strip()
             if not stripped:
@@ -864,12 +959,29 @@ class PlantDiseaseGUI(QMainWindow):
             elif "المسبب:" in stripped:
                 _w(stripped, color=C["out_blue"])
             elif "العلاج" in stripped:
+                in_treatment = True
                 _w("")
+                _w("╌" * 36, color=C["out_dim"])
                 _w(stripped, color=C["out_yellow"], bold=True)
-            elif stripped.startswith("- "):
-                _w(f"  {'◈'} {stripped[2:]}", color=C["out_text"])
+            elif stripped.startswith("- ") and in_treatment:
+                _w(f"    ◈  {stripped[2:]}", color=C["out_green"])
             elif "درجة الثقة" in stripped:
-                _w(stripped, color=C["out_green"])
+                # visual confidence bar
+                m = re.search(r"(\d+)/(\d+)", stripped)
+                if m:
+                    val, total = int(m.group(1)), int(m.group(2))
+                    filled = round(val / total * 10) if total else 0
+                    bar = "█" * filled + "░" * (10 - filled)
+                    if val >= 70:
+                        bar_color = C["out_green"]
+                    elif val >= 50:
+                        bar_color = C["out_yellow"]
+                    else:
+                        bar_color = C["out_red"]
+                    _w(stripped, color=bar_color)
+                    _w(f"    {bar}  {val}%", color=bar_color, bold=True)
+                else:
+                    _w(stripped, color=C["out_green"])
             elif stripped.startswith("─"):
                 _w(stripped, color=C["out_dim"])
             else:
@@ -882,6 +994,43 @@ class PlantDiseaseGUI(QMainWindow):
         sc = self.output.verticalScrollBar()
         if sc:
             sc.setValue(0)
+
+        # سجل التشخيصات
+        if not getattr(self, '_from_history', False):
+            ts = datetime.now().strftime("%H:%M:%S")
+            self.history.append({
+                "crop": crop, "mode": mode,
+                "symptoms_count": symptoms_count,
+                "raw": raw, "timestamp": ts,
+                "extra": extra,
+            })
+            self.history_count_lbl.setText(f"{len(self.history)} تشخيص")
+            item = QListWidgetItem(
+                f"{crop} · {mode} · {symptoms_count} أعراض · {ts}"
+            )
+            self.history_list.insertItem(0, item)
+
+    def _toggle_history(self):
+        visible = self.history_list.isVisible()
+        self.history_list.setVisible(not visible)
+        self.history_toggle_btn.setText("إخفاء" if not visible else "عرض")
+
+    def _show_history_item(self, index):
+        if not index.isValid():
+            return
+        row = self.history_list.count() - 1 - index.row()
+        entry = self.history[row]
+        self._from_history = True
+        try:
+            self._display_output(
+                crop=entry["crop"],
+                mode=entry["mode"],
+                symptoms_count=entry["symptoms_count"],
+                raw=entry["raw"],
+                extra=entry.get("extra", ""),
+            )
+        finally:
+            self._from_history = False
 
 
 # ── نقطة الدخول ───────────────────────────────────────────────────────────────
