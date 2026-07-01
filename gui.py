@@ -1,5 +1,5 @@
 """
-gui.py — واجهة رسومية احترافية مستوحاة من OpenAI Platform
+gui.py — Professional GUI inspired by OpenAI Platform (Dark & Blue Theme)
 """
 import sys
 import collections
@@ -13,13 +13,12 @@ except AttributeError:
 import io
 import re
 from datetime import datetime
-from contextlib import redirect_stdout
 
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QTabWidget, QTextEdit, QPushButton,
     QListWidget, QListWidgetItem, QMessageBox, QFrame,
-    QSizePolicy, QScrollArea, QSlider,
+    QSizePolicy, QScrollArea, QSlider, QSpinBox, QCheckBox,
 )
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QFont, QTextCharFormat, QColor, QTextCursor
@@ -28,59 +27,56 @@ from core import Symptom
 from symptom_mapper import map_text_to_symptoms
 from main import ENGINES
 
-
-# ── لوحة الألوان ─────────────────────────────────────────────────────────────
 C = {
-    # الشريط الجانبي (داكن)
-    "sb_bg":          "#1a1a2e",
-    "sb_hover":       "#252540",
-    "sb_active":      "#16213e",
-    "sb_border":      "#2a2a4a",
-    "sb_text":        "#c8c8e0",
-    "sb_text_dim":    "#5a5a7a",
+    # Sidebar (Deep Dark)
+    "sb_bg":          "#0a0b0e",
+    "sb_hover":       "#14151a",
+    "sb_active":      "#1e2028",
+    "sb_border":      "#1a1b22",
+    "sb_text":        "#a1a1aa",
+    "sb_text_dim":    "#52525b",
 
-    # المحتوى الرئيسي
-    "bg":             "#f7f7f9",
-    "card":           "#ffffff",
-    "border":         "#e8e8ef",
-    "border_focus":   "#10a37f",
+    # Main Content
+    "bg":             "#0f1115",
+    "card":           "#181a20",
+    "border":         "#272a35",
+    "border_focus":   "#3b82f6",
 
-    # النصوص
-    "text":           "#1a1a2e",
-    "text_muted":     "#6e6e8e",
-    "text_hint":      "#9090b0",
+    # Text
+    "text":           "#e4e4e7",
+    "text_muted":     "#a1a1aa",
+    "text_hint":      "#71717a",
 
-    # اللون الأساسي
-    "green":          "#10a37f",
-    "green_hover":    "#0d8f6e",
-    "green_light":    "#e6f7f2",
-    "green_text":     "#0b7a60",
+    # Primary Accent (Professional Blue)
+    "blue":           "#3b82f6",
+    "blue_hover":     "#2563eb",
+    "blue_light":     "#172554",
+    "blue_text":      "#60a5fa",
+    "blue_border":    "#1e3a8a",
 
-    # الحالات
+    # Status
     "amber":          "#f59e0b",
-    "amber_light":    "#fef3c7",
     "red":            "#ef4444",
-    "red_light":      "#fee2e2",
 
-    # منطقة الإخراج
-    "out_bg":         "#0f0f1a",
-    "out_text":       "#cdd6f4",
-    "out_green":      "#a6e3a1",
-    "out_blue":       "#89b4fa",
-    "out_yellow":     "#f9e2af",
-    "out_red":        "#f38ba8",
-    "out_dim":        "#45475a",
-    "out_border":     "#1e1e3a",
+    # Terminal Output
+    "out_bg":         "#090a0c",
+    "out_text":       "#cbd5e1",
+    "out_blue":       "#60a5fa",
+    "out_purple":     "#c084fc",
+    "out_yellow":     "#fcd34d",
+    "out_red":        "#fca5a5",
+    "out_dim":        "#64748b",
+    "out_border":     "#1e293b",
 }
 
 STYLESHEET = f"""
-/* ═══ القاعدة ═══ */
-* {{ font-family: "Segoe UI", "Tahoma", "Arial", sans-serif; }}
+/* ═══ Base ═══ */
+* {{ font-family: "Inter", "Segoe UI", "Arial", sans-serif; }}
 
 QMainWindow {{ background: {C['bg']}; }}
 QWidget#root {{ background: {C['bg']}; }}
 
-/* ═══ شريط العنوان ═══ */
+/* ═══ Header ═══ */
 QWidget#header {{
     background: {C['card']};
     border-bottom: 1px solid {C['border']};
@@ -98,7 +94,7 @@ QLabel#app_sub {{
     font-size: 11px;
 }}
 
-/* ═══ الشريط الجانبي ═══ */
+/* ═══ Sidebar ═══ */
 QWidget#sidebar {{
     background: {C['sb_bg']};
 }}
@@ -128,7 +124,7 @@ QListWidget#crop_list::item:hover {{
     background: {C['sb_hover']};
 }}
 QListWidget#crop_list::item:selected {{
-    background: {C['green']};
+    background: {C['blue']};
     color: #ffffff;
     font-weight: 600;
 }}
@@ -139,12 +135,12 @@ QLabel#sb_footer {{
     padding: 12px 16px;
 }}
 
-/* ═══ المحتوى ═══ */
+/* ═══ Content ═══ */
 QWidget#content {{
     background: {C['bg']};
 }}
 
-/* ═══ البطاقات ═══ */
+/* ═══ Cards ═══ */
 QFrame#card {{
     background: {C['card']};
     border: 1px solid {C['border']};
@@ -162,7 +158,7 @@ QLabel#hint {{
     font-size: 12px;
 }}
 
-/* ═══ التبويبات ═══ */
+/* ═══ Tabs ═══ */
 QTabWidget#tabs::pane {{
     border: none;
     background: transparent;
@@ -178,14 +174,14 @@ QTabBar::tab {{
     margin-bottom: -1px;
 }}
 QTabBar::tab:selected {{
-    color: {C['green']};
-    border-bottom: 2px solid {C['green']};
+    color: {C['blue']};
+    border-bottom: 2px solid {C['blue']};
 }}
 QTabBar::tab:hover:!selected {{
     color: {C['text']};
 }}
 
-/* ═══ حقل النص ═══ */
+/* ═══ Text Input ═══ */
 QTextEdit#nlp_input {{
     background: {C['bg']};
     border: 1.5px solid {C['border']};
@@ -194,14 +190,14 @@ QTextEdit#nlp_input {{
     font-size: 13px;
     color: {C['text']};
     line-height: 1.5;
-    selection-background-color: {C['green_light']};
+    selection-background-color: {C['blue_light']};
 }}
 QTextEdit#nlp_input:focus {{
-    border: 1.5px solid {C['green']};
+    border: 1.5px solid {C['blue']};
     background: {C['card']};
 }}
 
-/* ═══ قائمة الأعراض ═══ */
+/* ═══ Symptoms List ═══ */
 QListWidget#sym_list {{
     background: {C['bg']};
     border: 1.5px solid {C['border']};
@@ -217,7 +213,7 @@ QListWidget#sym_list::item {{
     margin: 1px 2px;
 }}
 QListWidget#sym_list::item:hover {{
-    background: {C['green_light']};
+    background: {C['blue_light']};
 }}
 QListWidget#sym_list::indicator {{
     width: 15px;
@@ -226,13 +222,13 @@ QListWidget#sym_list::indicator {{
     border: 2px solid {C['border']};
 }}
 QListWidget#sym_list::indicator:checked {{
-    background: {C['green']};
-    border: 2px solid {C['green']};
+    background: {C['blue']};
+    border: 2px solid {C['blue']};
 }}
 
-/* ═══ الأزرار ═══ */
+/* ═══ Buttons ═══ */
 QPushButton#btn_primary {{
-    background: {C['green']};
+    background: {C['blue']};
     color: #ffffff;
     font-size: 13px;
     font-weight: 700;
@@ -241,8 +237,8 @@ QPushButton#btn_primary {{
     border: none;
     min-width: 130px;
 }}
-QPushButton#btn_primary:hover {{ background: {C['green_hover']}; }}
-QPushButton#btn_primary:pressed {{ background: #0b7a60; }}
+QPushButton#btn_primary:hover {{ background: {C['blue_hover']}; }}
+QPushButton#btn_primary:pressed {{ background: #1d4ed8; }}
 
 QPushButton#btn_ghost {{
     background: transparent;
@@ -256,22 +252,22 @@ QPushButton#btn_ghost {{
 QPushButton#btn_ghost:hover {{
     background: {C['bg']};
     color: {C['text']};
-    border-color: #c0c0d8;
+    border-color: #3f3f46;
 }}
 
 QPushButton#btn_chip {{
     background: transparent;
-    color: {C['green']};
+    color: {C['blue_text']};
     font-size: 11px;
     font-weight: 600;
     padding: 3px 10px;
     border-radius: 10px;
-    border: 1px solid {C['green']};
+    border: 1px solid {C['blue_border']};
     min-height: 22px;
 }}
-QPushButton#btn_chip:hover {{ background: {C['green_light']}; }}
+QPushButton#btn_chip:hover {{ background: {C['blue_light']}; }}
 
-/* ═══ الإخراج (Terminal) ═══ */
+/* ═══ Terminal Output ═══ */
 QTextEdit#output {{
     background: {C['out_bg']};
     color: {C['out_text']};
@@ -281,10 +277,10 @@ QTextEdit#output {{
     border: 1px solid {C['out_border']};
     border-radius: 12px;
     line-height: 1.7;
-    selection-background-color: #2a2a45;
+    selection-background-color: #1e293b;
 }}
 
-/* ═══ سجل التشخيصات ═══ */
+/* ═══ History List ═══ */
 QListWidget#hist_list {{
     background: {C['bg']};
     border: 1.5px solid {C['border']};
@@ -300,28 +296,61 @@ QListWidget#hist_list::item {{
     margin: 1px 2px;
 }}
 QListWidget#hist_list::item:hover {{
-    background: {C['green_light']};
+    background: {C['blue_light']};
 }}
 
-/* ═══ شرائح الأعراض ═══ */
+/* ═══ Symptom Chips ═══ */
 QLabel#chip {{
-    background: {C['green_light']};
-    color: {C['green_text']};
+    background: {C['blue_light']};
+    color: {C['blue_text']};
     font-size: 11px;
     font-weight: 700;
     padding: 3px 10px;
     border-radius: 10px;
-    border: 1px solid #a0dfd0;
+    border: 1px solid {C['blue_border']};
 }}
 
-/* ═══ شريط الحالة ═══ */
+/* ═══ Status Bar ═══ */
 QLabel#status {{
     color: {C['text_hint']};
     font-size: 11px;
     padding: 2px 0;
 }}
 
-/* ═══ الفاصل ═══ */
+/* ═══ CF SpinBox ═══ */
+QSpinBox#cf_spin {{
+    background: {C['card']};
+    border: 1.5px solid {C['border']};
+    border-radius: 5px;
+    padding: 1px 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: {C['blue_text']};
+    min-width: 46px;
+    max-width: 46px;
+}}
+QSpinBox#cf_spin:focus {{
+    border-color: {C['blue']};
+}}
+
+/* ═══ Symptoms CheckBox ═══ */
+QCheckBox#sym_check {{
+    color: {C['text']};
+    font-size: 13px;
+    spacing: 8px;
+}}
+QCheckBox#sym_check::indicator {{
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 2px solid {C['border']};
+}}
+QCheckBox#sym_check::indicator:checked {{
+    background: {C['blue']};
+    border: 2px solid {C['blue']};
+}}
+
+/* ═══ Dividers ═══ */
 QFrame#hdiv {{
     background: {C['border']};
     min-height: 1px;
@@ -333,13 +362,13 @@ QFrame#vdiv {{
     max-width: 1px;
 }}
 
-/* ═══ شريط التمرير ═══ */
+/* ═══ Scrollbar ═══ */
 QScrollBar:vertical {{
     background: transparent;
     width: 5px;
 }}
 QScrollBar::handle:vertical {{
-    background: #ccccdd;
+    background: #3f3f46;
     border-radius: 2px;
     min-height: 24px;
 }}
@@ -348,6 +377,11 @@ QScrollBar::sub-line:vertical {{ height: 0; }}
 """
 
 CROP_EMOJIS = {
+    # English Mappings
+    "Apple": "🍎", "Cherry": "🍒", "Grape": "🍇", "Tomato": "🍅",
+    "Potato": "🥔", "Citrus": "🍊", "Zucchini": "🥒",
+    "Eggplant": "🍆", "Onion": "🧅", "Garlic": "🧄",
+    # Arabic Fallbacks (in case backend is not translated)
     "تفاح": "🍎", "كرز": "🍒", "عنب": "🍇", "طماطم": "🍅",
     "بطاطا": "🥔", "حمضيات": "🍊", "كوسا": "🥒",
     "باذنجان": "🍆", "البصل": "🧅", "الثوم": "🧄",
@@ -358,10 +392,10 @@ class PlantDiseaseGUI(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("نظام تشخيص الأمراض النباتية")
+        self.setWindowTitle("Plant Disease Diagnosis System")
         self.setMinimumSize(1020, 680)
         self.resize(1120, 740)
-        self.setLayoutDirection(Qt.RightToLeft)
+        self.setLayoutDirection(Qt.LeftToRight)
         self.setStyleSheet(STYLESHEET)
 
         self.history = []
@@ -388,11 +422,11 @@ class PlantDiseaseGUI(QMainWindow):
 
         main_v.addWidget(body, 1)
 
-        # تحديد المحصول الأول
+        # Select first crop by default
         self.crop_list.setCurrentRow(0)
         self._refresh_crop()
 
-    # ─────────────────────── الشريط العلوي ──────────────────────────────────
+    # ─────────────────────── Header ──────────────────────────────────────────
 
     def _make_header(self) -> QWidget:
         w = QWidget()
@@ -410,7 +444,7 @@ class PlantDiseaseGUI(QMainWindow):
         col = QVBoxLayout()
         col.setSpacing(1)
 
-        title = QLabel("نظام تشخيص الأمراض النباتية")
+        title = QLabel("Plant Disease Diagnosis System")
         title.setObjectName("app_title")
         col.addWidget(title)
 
@@ -423,18 +457,18 @@ class PlantDiseaseGUI(QMainWindow):
 
         badge = QLabel("NLP v2.0")
         badge.setStyleSheet(f"""
-            background: {C['green_light']};
-            color: {C['green_text']};
+            background: {C['blue_light']};
+            color: {C['blue_text']};
             font-size: 11px;
             font-weight: 700;
             padding: 5px 12px;
             border-radius: 8px;
-            border: 1px solid #a0dfd0;
+            border: 1px solid {C['blue_border']};
         """)
         h.addWidget(badge)
         return w
 
-    # ─────────────────────── الشريط الجانبي ─────────────────────────────────
+    # ─────────────────────── Sidebar ─────────────────────────────────────────
 
     def _make_sidebar(self) -> QWidget:
         w = QWidget()
@@ -444,7 +478,7 @@ class PlantDiseaseGUI(QMainWindow):
         v.setContentsMargins(0, 0, 0, 0)
         v.setSpacing(0)
 
-        lbl = QLabel("CROP / المحصول")
+        lbl = QLabel("CROP / PLANT")
         lbl.setObjectName("sb_section")
         v.addWidget(lbl)
 
@@ -463,16 +497,16 @@ class PlantDiseaseGUI(QMainWindow):
         self.crop_list.currentItemChanged.connect(lambda *_: self._refresh_crop())
         v.addWidget(self.crop_list, 1)
 
-        # شريط التذييل
+        # Footer
         v.addWidget(self._make_hdiv_dark())
-        footer = QLabel(f"  🌾  {len(ENGINES)} محاصيل · 35+ مرض")
+        footer = QLabel(f"  🌾  {len(ENGINES)} Crops · 35+ Diseases")
         footer.setObjectName("sb_footer")
         footer.setAlignment(Qt.AlignCenter)
         v.addWidget(footer)
 
         return w
 
-    # ─────────────────────── منطقة المحتوى ─────────────────────────────────
+    # ─────────────────────── Main Content ────────────────────────────────────
 
     def _make_content(self) -> QWidget:
         w = QWidget()
@@ -483,17 +517,16 @@ class PlantDiseaseGUI(QMainWindow):
 
         v.addWidget(self._make_input_card())
 
-        # صف الشرائح
+        # Detected Chips Row
         chips_row = QHBoxLayout()
         chips_row.setSpacing(8)
-        chips_row.setAlignment(Qt.AlignRight)
+        chips_row.setAlignment(Qt.AlignLeft)
 
-        self.lbl_chips_prefix = QLabel("✅ أعراض مكتشفة:")
+        self.lbl_chips_prefix = QLabel("✅ Detected Symptoms:")
         self.lbl_chips_prefix.setObjectName("hint")
         self.lbl_chips_prefix.setVisible(False)
         chips_row.addWidget(self.lbl_chips_prefix)
 
-        # حاوية الشرائح
         self.chips_container = QWidget()
         self.chips_h = QHBoxLayout(self.chips_container)
         self.chips_h.setContentsMargins(0, 0, 0, 0)
@@ -504,17 +537,17 @@ class PlantDiseaseGUI(QMainWindow):
 
         v.addLayout(chips_row)
 
-        # ─ فاصل ─
+        # ─ Divider ─
         v.addWidget(self._make_hdiv())
 
-        # ─ منطقة الإخراج ─
+        # ─ Output Area ─
         out_header = QHBoxLayout()
-        out_lbl = QLabel("📊 النتيجة والتشخيص")
+        out_lbl = QLabel("📊 Result & Diagnosis")
         out_lbl.setObjectName("card_title")
         out_header.addWidget(out_lbl)
         out_header.addStretch()
 
-        self.lbl_status = QLabel("جاهز · اختر المحصول ثم أدخل الأعراض")
+        self.lbl_status = QLabel("Ready · Select crop then enter symptoms")
         self.lbl_status.setObjectName("status")
         out_header.addWidget(self.lbl_status)
         v.addLayout(out_header)
@@ -523,25 +556,25 @@ class PlantDiseaseGUI(QMainWindow):
         self.output.setObjectName("output")
         self.output.setReadOnly(True)
         self.output.setPlaceholderText(
-            "ستظهر نتيجة التشخيص هنا بعد الضغط على زر «تشخيص» ..."
+            "Diagnosis result will appear here after clicking 'Diagnose' ..."
         )
         v.addWidget(self.output, 1)
 
-        # ─ سجل التشخيصات ─
+        # ─ History ─
         hist_header = QHBoxLayout()
         hist_header.setSpacing(10)
 
-        hist_lbl = QLabel("📜 سجل التشخيصات")
+        hist_lbl = QLabel("📜 Diagnosis History")
         hist_lbl.setObjectName("card_title")
         hist_header.addWidget(hist_lbl)
 
-        self.history_toggle_btn = QPushButton("عرض")
+        self.history_toggle_btn = QPushButton("Show")
         self.history_toggle_btn.setObjectName("btn_chip")
         self.history_toggle_btn.setCursor(Qt.PointingHandCursor)
         self.history_toggle_btn.clicked.connect(self._toggle_history)
         hist_header.addWidget(self.history_toggle_btn)
 
-        self.history_count_lbl = QLabel("0 تشخيص")
+        self.history_count_lbl = QLabel("0 Diagnoses")
         self.history_count_lbl.setObjectName("hint")
         hist_header.addWidget(self.history_count_lbl)
 
@@ -558,7 +591,7 @@ class PlantDiseaseGUI(QMainWindow):
 
         return w
 
-    # ─────────────────────── بطاقة الإدخال ─────────────────────────────────
+    # ─────────────────────── Input Card ──────────────────────────────────────
 
     def _make_input_card(self) -> QFrame:
         card = QFrame()
@@ -567,39 +600,39 @@ class PlantDiseaseGUI(QMainWindow):
         v.setContentsMargins(18, 14, 18, 14)
         v.setSpacing(10)
 
-        # رأس البطاقة
+        # Card Header
         top_row = QHBoxLayout()
-        top_lbl = QLabel("إدخال الأعراض")
+        top_lbl = QLabel("Symptom Input")
         top_lbl.setObjectName("card_title")
         top_row.addWidget(top_lbl)
         top_row.addStretch()
 
         self.lbl_crop_badge = QLabel("")
         self.lbl_crop_badge.setStyleSheet(f"""
-            background: {C['green_light']};
-            color: {C['green_text']};
+            background: {C['blue_light']};
+            color: {C['blue_text']};
             font-size: 12px;
             font-weight: 700;
             padding: 4px 12px;
             border-radius: 9px;
-            border: 1px solid #b0e8d8;
+            border: 1px solid {C['blue_border']};
         """)
         top_row.addWidget(self.lbl_crop_badge)
         v.addLayout(top_row)
 
-        # ─ التبويبات ─
+        # ─ Tabs ─
         self.tabs = QTabWidget()
         self.tabs.setObjectName("tabs")
-        self.tabs.setStyleSheet("QTabWidget::tab-bar { alignment: right; }")
+        self.tabs.setStyleSheet("QTabWidget::tab-bar { alignment: left; }")
 
-        # تبويب NLP
+        # NLP Tab
         tab_nlp = QWidget()
         tn = QVBoxLayout(tab_nlp)
         tn.setContentsMargins(0, 10, 0, 0)
         tn.setSpacing(8)
 
         hint_nlp = QLabel(
-            "✍️  صِف الأعراض بكلماتك — فصيح أو عامي "
+            "✍️  Describe symptoms in your own words"
         )
         hint_nlp.setObjectName("hint")
         tn.addWidget(hint_nlp)
@@ -608,18 +641,19 @@ class PlantDiseaseGUI(QMainWindow):
         self.nlp_input.setObjectName("nlp_input")
         self.nlp_input.setFixedHeight(82)
         self.nlp_input.setPlaceholderText(
-            "مثال: الأوراق عم تصفر وتتساقط، في بقع لامعة زيتية على الورق..."
+            "Example: Leaves are yellowing and falling, there are shiny oily spots..."
         )
         tn.addWidget(self.nlp_input)
 
-        # أمثلة سريعة
+        # Quick Examples
         ex_row = QHBoxLayout()
         ex_row.setSpacing(6)
-        ex_row.setAlignment(Qt.AlignRight)
-        ex_lbl = QLabel("جرّب:")
+        ex_row.setAlignment(Qt.AlignLeft)
+        ex_lbl = QLabel("Try:")
         ex_lbl.setObjectName("hint")
         ex_row.addWidget(ex_lbl)
 
+        # Translated Quick Examples (feel free to change based on the crop context)
         for sample in ["الورق اصفر", "تعفن الثمار", "بقع بيضاء", "ذبول مفاجئ"]:
             btn = QPushButton(sample)
             btn.setObjectName("btn_chip")
@@ -631,89 +665,112 @@ class PlantDiseaseGUI(QMainWindow):
         ex_row.addStretch()
         tn.addLayout(ex_row)
 
-        # تبويب يدوي
+        # ─ NLP Detected Symptoms CF Area ─
+        self._nlp_cf_widget = QWidget()
+        self._nlp_cf_widget.setVisible(False)
+        nlp_cf_lay = QVBoxLayout(self._nlp_cf_widget)
+        nlp_cf_lay.setContentsMargins(0, 4, 0, 0)
+        nlp_cf_lay.setSpacing(3)
+
+        nlp_cf_hdr = QLabel("✅ Detected Symptoms — set confidence factor (CF) for each:")
+        nlp_cf_hdr.setObjectName("hint")
+        nlp_cf_lay.addWidget(nlp_cf_hdr)
+
+        self._nlp_cf_scroll = QScrollArea()
+        self._nlp_cf_scroll.setWidgetResizable(True)
+        self._nlp_cf_scroll.setFixedHeight(90)
+        self._nlp_cf_scroll.setStyleSheet(f"""
+            QScrollArea {{
+                border: 1.5px solid {C['blue_border']};
+                border-radius: 8px;
+                background: {C['blue_light']};
+            }}
+            QScrollArea > QWidget > QWidget {{
+                background: {C['blue_light']};
+            }}
+        """)
+        self._nlp_cf_inner = QWidget()
+        self._nlp_cf_inner.setStyleSheet(f"background: {C['blue_light']};" )
+        self._nlp_cf_vlay = QVBoxLayout(self._nlp_cf_inner)
+        self._nlp_cf_vlay.setContentsMargins(6, 4, 6, 4)
+        self._nlp_cf_vlay.setSpacing(2)
+        self._nlp_cf_scroll.setWidget(self._nlp_cf_inner)
+        nlp_cf_lay.addWidget(self._nlp_cf_scroll)
+        tn.addWidget(self._nlp_cf_widget)
+
+        self._nlp_cf_widgets: dict[str, QSpinBox] = {}
+
+        # Manual Tab
         tab_manual = QWidget()
         tm = QVBoxLayout(tab_manual)
         tm.setContentsMargins(0, 10, 0, 0)
-        tm.setSpacing(6)
+        tm.setSpacing(4)
 
-        hint_m = QLabel("📋  اختر الأعراض من القائمة — يمكن تحديد أكثر من عرض")
+        hint_m = QLabel("📋  Select symptoms and set confidence factor (CF) for each")
         hint_m.setObjectName("hint")
         tm.addWidget(hint_m)
 
-        self.sym_list = QListWidget()
-        self.sym_list.setObjectName("sym_list")
-        self.sym_list.setSelectionMode(QListWidget.NoSelection)
-        self.sym_list.setFixedHeight(118)
-        tm.addWidget(self.sym_list)
-
-        # ─ شريط عامل الثقة (CF) ─
-        cf_row = QHBoxLayout()
-        cf_row.setSpacing(8)
-        cf_label = QLabel("عامل الثقة (CF):")
-        cf_label.setObjectName("hint")
-        cf_row.addWidget(cf_label)
-
-        self.cf_slider = QSlider(Qt.Horizontal)
-        self.cf_slider.setObjectName("cf_slider")
-        self.cf_slider.setRange(0, 100)
-        self.cf_slider.setValue(100)
-        self.cf_slider.setFixedHeight(22)
-        self.cf_slider.setStyleSheet(f"""
-            QSlider#cf_slider::groove:horizontal {{
-                background: {C['border']};
-                height: 6px;
-                border-radius: 3px;
+        self._sym_scroll = QScrollArea()
+        self._sym_scroll.setWidgetResizable(True)
+        self._sym_scroll.setFixedHeight(155)
+        self._sym_scroll.setStyleSheet(f"""
+            QScrollArea {{
+                border: 1.5px solid {C['border']};
+                border-radius: 10px;
+                background: {C['bg']};
             }}
-            QSlider#cf_slider::handle:horizontal {{
-                background: {C['green']};
-                width: 16px;
-                height: 16px;
-                margin: -5px 0;
-                border-radius: 8px;
-            }}
-            QSlider#cf_slider::sub-page:horizontal {{
-                background: {C['green']};
-                border-radius: 3px;
+            QScrollArea > QWidget > QWidget {{
+                background: {C['bg']};
             }}
         """)
-        cf_row.addWidget(self.cf_slider, 1)
 
-        self.cf_value_lbl = QLabel("100")
-        self.cf_value_lbl.setObjectName("hint")
-        self.cf_value_lbl.setFixedWidth(30)
-        self.cf_slider.valueChanged.connect(
-            lambda v: self.cf_value_lbl.setText(str(v))
-        )
-        cf_row.addWidget(self.cf_value_lbl)
+        self._sym_container = QWidget()
+        self._sym_container.setStyleSheet(f"background: {C['bg']};" )
+        self._sym_vlay = QVBoxLayout(self._sym_container)
+        self._sym_vlay.setContentsMargins(6, 4, 6, 4)
+        self._sym_vlay.setSpacing(2)
+        self._sym_vlay.addStretch()
 
-        tm.addLayout(cf_row)
+        self._sym_scroll.setWidget(self._sym_container)
+        tm.addWidget(self._sym_scroll)
 
-        self.tabs.addTab(tab_nlp, "🤖  التحليل الذكي")
-        self.tabs.addTab(tab_manual, "📋  الاختيار اليدوي")
+        self._sym_widgets: dict[str, tuple] = {}
+
+        self.tabs.addTab(tab_nlp, "🤖  Smart Analysis (NLP)")
+        self.tabs.addTab(tab_manual, "📋  Manual Selection")
         v.addWidget(self.tabs)
 
-        # أزرار التشغيل
+        # Action Buttons
         btn_row = QHBoxLayout()
         btn_row.setSpacing(8)
 
-        btn_clr = QPushButton("مسح")
+        btn_clr = QPushButton("Clear")
         btn_clr.setObjectName("btn_ghost")
         btn_clr.setCursor(Qt.PointingHandCursor)
         btn_clr.clicked.connect(self._clear)
         btn_row.addStretch()
         btn_row.addWidget(btn_clr)
 
-        btn_diag = QPushButton("🔍  تشخيص")
+        self.btn_detect = QPushButton("🔎  Detect Symptoms")
+        self.btn_detect.setObjectName("btn_ghost")
+        self.btn_detect.setCursor(Qt.PointingHandCursor)
+        self.btn_detect.clicked.connect(self._detect_only)
+        btn_row.addWidget(self.btn_detect)
+
+        btn_diag = QPushButton("🩺  Diagnose")
         btn_diag.setObjectName("btn_primary")
         btn_diag.setCursor(Qt.PointingHandCursor)
         btn_diag.clicked.connect(self._diagnose)
         btn_row.addWidget(btn_diag)
 
+        self.tabs.currentChanged.connect(
+            lambda i: self.btn_detect.setVisible(i == 0)
+        )
+
         v.addLayout(btn_row)
         return card
 
-    # ─────────────────────── المساعدات ──────────────────────────────────────
+    # ─────────────────────── Helpers ─────────────────────────────────────────
 
     def _make_hdiv(self) -> QFrame:
         f = QFrame()
@@ -739,7 +796,6 @@ class PlantDiseaseGUI(QMainWindow):
         item = self.crop_list.currentItem()
         if not item:
             return ""
-        # اسم المحصول بدون الإيموجي والمسافات
         return re.sub(r"[\s🍎🍒🍇🍅🥔🍊🥒🍆🧅🧄🌱]+", " ", item.text()).strip()
 
     def _refresh_crop(self):
@@ -750,30 +806,112 @@ class PlantDiseaseGUI(QMainWindow):
 
         self.lbl_crop_badge.setText(f"🌿 {name}")
 
-        self.sym_list.clear()
+        self._sym_widgets.clear()
+        while self._sym_vlay.count():
+            item = self._sym_vlay.takeAt(0)
+            w = item.widget()
+            if w:
+                w.setParent(None)
+                w.deleteLater()
+
         for sym in cls.SYMPTOMS:
-            item = QListWidgetItem(f"  {sym}")
-            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
-            item.setCheckState(Qt.Unchecked)
-            self.sym_list.addItem(item)
+            row_w = QWidget()
+            row_w.setObjectName("sym_row")
+            row_h = QHBoxLayout(row_w)
+            row_h.setContentsMargins(4, 2, 4, 2)
+            row_h.setSpacing(6)
+
+            chk = QCheckBox(sym)
+            chk.setObjectName("sym_check")
+            chk.setChecked(False)
+            row_h.addWidget(chk, 1)
+
+            sld = QSlider(Qt.Horizontal)
+            sld.setRange(0, 100)
+            sld.setValue(80)
+            sld.setFixedWidth(80)
+            sld.setFixedHeight(18)
+            sld.setEnabled(False)
+            sld.setStyleSheet(f"""
+                QSlider::groove:horizontal {{
+                    background: {C['border']};
+                    height: 4px; border-radius: 2px;
+                }}
+                QSlider::handle:horizontal {{
+                    background: {C['blue']};
+                    width: 12px; height: 12px;
+                    margin: -4px 0; border-radius: 6px;
+                }}
+                QSlider::sub-page:horizontal {{
+                    background: {C['blue']};
+                    border-radius: 2px;
+                }}
+                QSlider:disabled::groove:horizontal {{
+                    background: {C['border']};
+                }}
+                QSlider:disabled::handle:horizontal {{
+                    background: #3f3f46;
+                }}
+            """)
+            row_h.addWidget(sld)
+
+            spn = QSpinBox()
+            spn.setObjectName("cf_spin")
+            spn.setRange(0, 100)
+            spn.setValue(80)
+            spn.setEnabled(False)
+            spn.setSuffix("%")
+            spn.setButtonSymbols(QSpinBox.NoButtons)
+            row_h.addWidget(spn)
+
+            sld.valueChanged.connect(spn.setValue)
+            spn.valueChanged.connect(sld.setValue)
+
+            def _toggle(checked, s=sld, sp=spn):
+                s.setEnabled(checked)
+                sp.setEnabled(checked)
+
+            chk.toggled.connect(_toggle)
+
+            self._sym_vlay.addWidget(row_w)
+            self._sym_widgets[sym] = (chk, spn)
+
+        self._sym_vlay.addStretch()
 
         self._clear_chips()
+        self._nlp_cf_widget.setVisible(False)
+        self._nlp_cf_widgets.clear()
+        while self._nlp_cf_vlay.count():
+            item = self._nlp_cf_vlay.takeAt(0)
+            w = item.widget()
+            if w:
+                w.setParent(None)
+                w.deleteLater()
         self.lbl_status.setText(
-            f"محصول: {name}  ·  {len(cls.SYMPTOMS)} عرض متاح"
+            f"Crop: {name}  ·  {len(cls.SYMPTOMS)} available symptoms"
         )
 
     def _inject_example(self, text: str):
         cur = self.nlp_input.toPlainText().strip()
-        self.nlp_input.setText(f"{cur}، {text}" if cur else text)
+        self.nlp_input.setText(f"{cur}, {text}" if cur else text)
         self.nlp_input.setFocus()
 
     def _clear(self):
         self.nlp_input.clear()
-        for i in range(self.sym_list.count()):
-            self.sym_list.item(i).setCheckState(Qt.Unchecked)
+        for sym, (chk, spn) in self._sym_widgets.items():
+            chk.setChecked(False)
+            spn.setValue(80)
+        self._nlp_cf_widget.setVisible(False)
+        self._nlp_cf_widgets.clear()
+        while self._nlp_cf_vlay.count():
+            item = self._nlp_cf_vlay.takeAt(0)
+            w = item.widget()
+            if w:
+                w.setParent(None)
+                w.deleteLater()
         self.output.clear()
         self._clear_chips()
-        self.lbl_status.setText("تم المسح · جاهز للتشخيص من جديد")
+        self.lbl_status.setText("Cleared · Ready for new diagnosis")
 
     def _clear_chips(self):
         while self.chips_h.count():
@@ -789,7 +927,7 @@ class PlantDiseaseGUI(QMainWindow):
             return
         self.lbl_chips_prefix.setVisible(True)
         self.chips_container.setVisible(True)
-        for sym in symptoms[:6]:          # أقصى 6 شرائح
+        for sym in symptoms[:6]:
             short = sym[:28] + "…" if len(sym) > 28 else sym
             chip = QLabel(short)
             chip.setObjectName("chip")
@@ -800,99 +938,185 @@ class PlantDiseaseGUI(QMainWindow):
             more.setObjectName("chip")
             self.chips_h.addWidget(more)
 
-    # ─────────────────────── تشغيل المحرك ───────────────────────────────────
+    # ─────────────────────── Engine Execution ────────────────────────────────
 
     def _run_engine(self, cls, facts: list) -> str:
         if not facts:
             return ""
-        engine = cls()
-        engine.reset()
-        for f in facts:
-            engine.declare(f)
+        import sys as _sys
         buf = io.StringIO()
-        with redirect_stdout(buf):
+        old_stdout = _sys.stdout
+        try:
+            _sys.stdout = buf
+            engine = cls()
+            engine.reset()
+            for f in facts:
+                engine.declare(f)
             engine.run()
+        except Exception as e:
+            _sys.stdout = old_stdout
+            return f"[Engine Error: {e}]"
+        finally:
+            _sys.stdout = old_stdout
         return buf.getvalue().strip()
 
-    # ─────────────────────── التشخيص ────────────────────────────────────────
+    # ─────────────────────── Diagnosis ───────────────────────────────────────
 
     def _diagnose(self):
         cls = self._engine_class()
         name = self._crop_name()
         if not cls:
-            QMessageBox.warning(self, "تنبيه", "اختر محصولاً أولاً.")
+            QMessageBox.warning(self, "Warning", "Please select a crop first.")
             return
 
         if self.tabs.currentIndex() == 0:
-            self._run_nlp(cls, name)
+            if self._nlp_cf_widgets:
+                text = self.nlp_input.toPlainText().strip()
+                self._run_nlp_diagnose(cls, name, text)
+            else:
+                self._run_nlp(cls, name)
         else:
             self._run_manual(cls, name)
 
     def _run_nlp(self, cls, name: str):
         text = self.nlp_input.toPlainText().strip()
         if not text:
-            QMessageBox.warning(self, "تنبيه", "أدخل وصف الأعراض أولاً.")
+            QMessageBox.warning(self, "Warning", "Please enter symptom description first.")
             return
 
         detected = map_text_to_symptoms(text, crop_symptoms=cls.SYMPTOMS)
 
         if not detected:
             self._clear_chips()
+            self._nlp_cf_widget.setVisible(False)
             self._display_error(
-                "لم يُكتشف أي عرض في النص",
-                "جرّب:\n"
-                "  • إعادة الصياغة بتفصيل أكبر\n"
-                "  • استخدام الأمثلة السريعة كبداية\n"
-                "  • التبديل إلى الاختيار اليدوي",
+                "No symptoms detected in text",
+                "Try:\n"
+                "  • Rephrasing with more details\n"
+                "  • Using quick examples to start\n"
+                "  • Switching to manual selection",
             )
-            self.lbl_status.setText("لم يُكتشف أعراض · جرّب صياغة أخرى")
+            self.lbl_status.setText("No symptoms detected · Try another phrasing")
             return
 
-        self._show_chips(detected)
-        raw = self._run_engine(cls, [Symptom(name=s, cf=80) for s in detected])
+        self._nlp_cf_widgets.clear()
+        while self._nlp_cf_vlay.count():
+            item = self._nlp_cf_vlay.takeAt(0)
+            w = item.widget()
+            if w:
+                w.setParent(None)
+                w.deleteLater()
 
+        for sym in detected:
+            row_w = QWidget()
+            row_w.setStyleSheet("background: transparent;")
+            row_h = QHBoxLayout(row_w)
+            row_h.setContentsMargins(2, 1, 2, 1)
+            row_h.setSpacing(6)
+
+            lbl = QLabel(f"✔ {sym}")
+            lbl.setStyleSheet(f"color: {C['blue_text']}; font-size: 12px; font-weight: 600;")
+            row_h.addWidget(lbl, 1)
+
+            sld = QSlider(Qt.Horizontal)
+            sld.setRange(0, 100)
+            sld.setValue(80)
+            sld.setFixedWidth(70)
+            sld.setFixedHeight(16)
+            sld.setStyleSheet(f"""
+                QSlider::groove:horizontal {{ background: {C['blue_border']}; height: 4px; border-radius: 2px; }}
+                QSlider::handle:horizontal {{ background: {C['blue']}; width: 12px; height: 12px; margin: -4px 0; border-radius: 6px; }}
+                QSlider::sub-page:horizontal {{ background: {C['blue']}; border-radius: 2px; }}
+            """)
+            row_h.addWidget(sld)
+
+            spn = QSpinBox()
+            spn.setRange(0, 100)
+            spn.setValue(80)
+            spn.setSuffix("%")
+            spn.setButtonSymbols(QSpinBox.NoButtons)
+            spn.setFixedWidth(52)
+            spn.setStyleSheet(f"""
+                QSpinBox {{
+                    background: {C['card']}; border: 1px solid {C['blue']};
+                    border-radius: 4px; padding: 1px 3px;
+                    font-size: 12px; font-weight: 700; color: {C['blue_text']};
+                }}
+            """)
+            sld.valueChanged.connect(spn.setValue)
+            spn.valueChanged.connect(sld.setValue)
+            row_h.addWidget(spn)
+
+            self._nlp_cf_vlay.addWidget(row_w)
+            self._nlp_cf_widgets[sym] = spn
+
+        self._nlp_cf_widget.setVisible(True)
+        self._show_chips(detected)
+        self.lbl_status.setText(
+            f"✅ {len(detected)} symptoms detected · Adjust CF then Diagnose"
+        )
+
+    def _detect_only(self):
+        cls = self._engine_class()
+        name = self._crop_name()
+        if not cls:
+            QMessageBox.warning(self, "Warning", "Please select a crop first.")
+            return
+        self._run_nlp(cls, name)
+
+    def _run_nlp_diagnose(self, cls, name: str, text: str):
+        if not self._nlp_cf_widgets:
+            QMessageBox.warning(self, "Warning", "Enter text first to detect symptoms.")
+            return
+
+        facts = [Symptom(name=sym, cf=spn.value()) for sym, spn in self._nlp_cf_widgets.items()]
+        raw = self._run_engine(cls, facts)
         self._display_output(
             crop=name,
             mode="NLP",
-            extra=f"النص: {text[:70]}{'…' if len(text)>70 else ''}",
-            symptoms_count=len(detected),
+            extra=f"Text: {text[:70]}{'…' if len(text)>70 else ''}",
+            symptoms_count=len(facts),
             raw=raw,
         )
-        self.lbl_status.setText(
-            f"✅ {len(detected)} عرض مكتشف  ·  {name}  ·  CF افتراضي 80"
-        )
+        self.lbl_status.setText(f"✅ {len(facts)} symptoms · {name}")
 
     def _run_manual(self, cls, name: str):
         selected = []
-        for i in range(self.sym_list.count()):
-            item = self.sym_list.item(i)
-            if item.checkState() == Qt.Checked:
-                selected.append(Symptom(name=item.text().strip(), cf=self.cf_slider.value()))
+        for sym, (chk, spn) in self._sym_widgets.items():
+            if chk.isChecked():
+                selected.append(Symptom(name=sym, cf=spn.value()))
 
         if not selected:
-            QMessageBox.warning(self, "تنبيه", "حدّد عرضاً واحداً على الأقل.")
+            QMessageBox.warning(self, "Warning", "Select at least one symptom.")
             return
 
         self._clear_chips()
         raw = self._run_engine(cls, selected)
 
+        if not raw:
+            self._display_error(
+                "System could not diagnose the disease",
+                "  • Ensure CF >= 60%\n"
+                "  • Add more symptoms for better accuracy",
+            )
+            self.lbl_status.setText(f"⚠ No diagnosis · Check CF or add symptoms")
+            return
+
         self._display_output(
             crop=name,
-            mode="يدوي",
+            mode="Manual",
             symptoms_count=len(selected),
             raw=raw,
         )
-        self.lbl_status.setText(
-            f"✅ {len(selected)} أعراض يدوية  ·  {name}  ·  CF = {self.cf_slider.value()}"
-        )
+        self.lbl_status.setText(f"✅ {len(selected)} manual symptoms  ·  {name}")
 
-    # ─────────────────────── تنسيق الإخراج ─────────────────────────────────
+    # ─────────────────────── Output Formatting ───────────────────────────────
 
     def _display_error(self, title: str, body: str):
         self.output.clear()
         cur = self.output.textCursor()
 
-        def _write(text, color="#ef4444", bold=False, nl=True):
+        def _write(text, color=C["out_red"], bold=False, nl=True):
             fmt = QTextCharFormat()
             fmt.setForeground(QColor(color))
             if bold:
@@ -924,25 +1148,23 @@ class PlantDiseaseGUI(QMainWindow):
             cur.setCharFormat(fmt)
             cur.insertText(text + ("\n" if nl else ""))
 
-        # رأس الجلسة
         crop_emoji = CROP_EMOJIS.get(crop, "🌱")
         _w("─" * 48, color=C["out_dim"])
-        _w(f"  {crop_emoji}  المحصول   :  {crop}", color=C["out_blue"], bold=True)
-        _w(f"  📥  الإدخال   :  {mode}", color=C["out_dim"])
+        _w(f"  {crop_emoji}  Crop      :  {crop}", color=C["out_blue"], bold=True)
+        _w(f"  📥  Input     :  {mode}", color=C["out_dim"])
         if extra:
             _w(f"  📝  {extra}", color=C["out_dim"])
-        _w(f"  🔎  الأعراض   :  {symptoms_count}", color=C["out_dim"])
+        _w(f"  🔎  Symptoms  :  {symptoms_count}", color=C["out_dim"])
         _w("─" * 48, color=C["out_dim"])
 
         if not raw:
             _w("")
-            _w("⚠  لم يتمكن النظام من تحديد مرض محدد.", color=C["out_yellow"])
-            _w("   أضِف أعراضاً أكثر لتحسين الدقة.", color=C["out_dim"])
+            _w("⚠  System could not determine a specific disease.", color=C["out_yellow"])
+            _w("   Add more symptoms to improve accuracy.", color=C["out_dim"])
             return
 
         _w("")
 
-        # تلوين سطر المخرجات
         in_treatment = False
         for line in raw.split("\n"):
             stripped = line.strip()
@@ -950,30 +1172,29 @@ class PlantDiseaseGUI(QMainWindow):
                 _w("")
                 continue
 
-            if "التشخيص:" in stripped:
-                _w(stripped, color=C["out_green"], bold=True)
-            elif "تشخيص مبدئي:" in stripped:
+            if "Diagnosis:" in stripped or "التشخيص:" in stripped:
+                _w(stripped, color=C["out_blue"], bold=True)
+            elif "Preliminary Diagnosis:" in stripped or "تشخيص مبدئي:" in stripped:
                 _w(stripped, color=C["out_yellow"], bold=True)
-            elif "احتمال ضعيف:" in stripped:
+            elif "Low Probability:" in stripped or "احتمال ضعيف:" in stripped:
                 _w(stripped, color=C["out_red"])
-            elif "المسبب:" in stripped:
-                _w(stripped, color=C["out_blue"])
-            elif "العلاج" in stripped:
+            elif "Cause:" in stripped or "المسبب:" in stripped:
+                _w(stripped, color=C["out_purple"])
+            elif "Treatment" in stripped or "العلاج" in stripped:
                 in_treatment = True
                 _w("")
                 _w("╌" * 36, color=C["out_dim"])
                 _w(stripped, color=C["out_yellow"], bold=True)
             elif stripped.startswith("- ") and in_treatment:
-                _w(f"    ◈  {stripped[2:]}", color=C["out_green"])
-            elif "درجة الثقة" in stripped:
-                # visual confidence bar
+                _w(f"    ◈  {stripped[2:]}", color=C["out_blue"])
+            elif "Confidence" in stripped or "درجة الثقة" in stripped:
                 m = re.search(r"(\d+)/(\d+)", stripped)
                 if m:
                     val, total = int(m.group(1)), int(m.group(2))
                     filled = round(val / total * 10) if total else 0
                     bar = "█" * filled + "░" * (10 - filled)
                     if val >= 70:
-                        bar_color = C["out_green"]
+                        bar_color = C["out_blue"]
                     elif val >= 50:
                         bar_color = C["out_yellow"]
                     else:
@@ -981,21 +1202,19 @@ class PlantDiseaseGUI(QMainWindow):
                     _w(stripped, color=bar_color)
                     _w(f"    {bar}  {val}%", color=bar_color, bold=True)
                 else:
-                    _w(stripped, color=C["out_green"])
+                    _w(stripped, color=C["out_blue"])
             elif stripped.startswith("─"):
                 _w(stripped, color=C["out_dim"])
             else:
                 _w(stripped, color=C["out_dim"])
 
-        self.output.setTextCursor(
-            self.output.document().find("")
-        )
-        # اذهب للأعلى
+        start_cursor = self.output.textCursor()
+        start_cursor.movePosition(QTextCursor.Start)
+        self.output.setTextCursor(start_cursor)
         sc = self.output.verticalScrollBar()
         if sc:
             sc.setValue(0)
 
-        # سجل التشخيصات
         if not getattr(self, '_from_history', False):
             ts = datetime.now().strftime("%H:%M:%S")
             self.history.append({
@@ -1004,16 +1223,16 @@ class PlantDiseaseGUI(QMainWindow):
                 "raw": raw, "timestamp": ts,
                 "extra": extra,
             })
-            self.history_count_lbl.setText(f"{len(self.history)} تشخيص")
+            self.history_count_lbl.setText(f"{len(self.history)} Diagnoses")
             item = QListWidgetItem(
-                f"{crop} · {mode} · {symptoms_count} أعراض · {ts}"
+                f"{crop} · {mode} · {symptoms_count} symptoms · {ts}"
             )
             self.history_list.insertItem(0, item)
 
     def _toggle_history(self):
         visible = self.history_list.isVisible()
         self.history_list.setVisible(not visible)
-        self.history_toggle_btn.setText("إخفاء" if not visible else "عرض")
+        self.history_toggle_btn.setText("Hide" if not visible else "Show")
 
     def _show_history_item(self, index):
         if not index.isValid():
@@ -1033,10 +1252,10 @@ class PlantDiseaseGUI(QMainWindow):
             self._from_history = False
 
 
-# ── نقطة الدخول ───────────────────────────────────────────────────────────────
+# ── Entry Point ───────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setFont(QFont("Segoe UI", 10))
+    app.setFont(QFont("Inter", 10))
 
     win = PlantDiseaseGUI()
     win.show()
